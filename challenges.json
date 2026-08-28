@@ -1,0 +1,117 @@
+[
+  {
+    "id": "demo01",
+    "title": "Hello, Flag!",
+    "category": "Misc",
+    "description": "Welcome to CYBERFLAGS! This is your very first challenge. The flag is hidden in plain sight. Sometimes the answer is simpler than you think. Just read carefully and try the most obvious answer.",
+    "difficulty": "easy",
+    "points": 50,
+    "flag": "flag{w3lc0m3_t0_cyb3rfl4gs}",
+    "flagHash": "7e1f8d5685fa74fb48ec7bcd36477789663f493a7d0b9227646ceff5c9a773b4",
+    "fileUrl": "",
+    "websiteUrl": "",
+    "author": "CyberFlags Team",
+    "hints": [
+      "The flag format is flag{...}",
+      "Read the challenge description very carefully!"
+    ],
+    "solves": 0,
+    "createdAt": "2026-08-28T18:00:00.000Z"
+  },
+  {
+    "id": "demo02",
+    "title": "Base64 Basics",
+    "category": "Crypto",
+    "description": "We intercepted this encoded message from a suspicious source. Can you decode it? The encoded string is: ZmxhZ3tiYXM2NF9pc19ub3RfZW5jcnlwdGlvbn0=",
+    "difficulty": "easy",
+    "points": 75,
+    "flag": "flag{bas64_is_not_encryption}",
+    "flagHash": "451db8086a3ab7f76a0fc644c48df6d94b9c4d8906cfe917859c812a7d75e08a",
+    "fileUrl": "",
+    "websiteUrl": "",
+    "author": "CryptoMaster",
+    "hints": [
+      "This is Base64 encoding",
+      "Use a Base64 decoder — there are many online tools"
+    ],
+    "solves": 0,
+    "createdAt": "2026-08-28T18:00:00.000Z"
+  },
+  {
+    "id": "demo03",
+    "title": "Inspect Element",
+    "category": "Web",
+    "description": "A secret message is hidden somewhere in the challenge webpage. Can you find the hidden flag? Open the challenge site and use your browser's developer tools to dig around. Not everything is visible on the surface...",
+    "difficulty": "easy",
+    "points": 100,
+    "flag": "flag{d3v_t00ls_ar3_y0ur_fri3nd}",
+    "flagHash": "8e512dbd7901a3e17d31403c535272ff38b4fad29d981566d2356599200e005c",
+    "fileUrl": "",
+    "websiteUrl": "",
+    "author": "WebHacker",
+    "hints": [
+      "Right-click → Inspect Element",
+      "Check the HTML comments and hidden elements"
+    ],
+    "solves": 0,
+    "createdAt": "2026-08-28T18:00:00.000Z"
+  },
+  {
+    "id": "demo04",
+    "title": "Caesar's Secret",
+    "category": "Crypto",
+    "description": "Julius Caesar used a simple cipher to communicate with his generals. We found this encoded message: \"iodj{fdhvdu_flskhu_lv_hdvb}\". Can you crack the code and recover the original flag?",
+    "difficulty": "medium",
+    "points": 150,
+    "flag": "flag{caesar_cipher_is_easy}",
+    "flagHash": "8278265d96c6871ab22646171b3bfaed0aa8d6738f18cc33ba90da44d1691447",
+    "fileUrl": "",
+    "websiteUrl": "",
+    "author": "CryptoMaster",
+    "hints": [
+      "This is a Caesar cipher with a shift of 3",
+      "Each letter is shifted forward by 3 positions in the alphabet"
+    ],
+    "solves": 0,
+    "createdAt": "2026-08-28T18:00:00.000Z"
+  },
+  {
+    "id": "demo05",
+    "title": "Binary Brain Teaser",
+    "category": "Misc",
+    "description": "Convert the following binary string to ASCII text to reveal the flag: 01100110 01101100 01100001 01101111 01111011 01100010 00110001 01101110 01100001 01110010 01111001 01011111 01101101 01100001 01110011 01110100 00110011 01110010 01111101",
+    "difficulty": "easy",
+    "points": 75,
+    "flag": "flag{b1nary_mast3r}",
+    "flagHash": "75fd327dd1f57394977d02bc710bc9cdd62adefdbd116582c5461b5dfb219e98",
+    "fileUrl": "",
+    "websiteUrl": "",
+    "author": "BinWiz",
+    "hints": [
+      "Each 8-digit group is one ASCII character",
+      "Google 'binary to ASCII converter'"
+    ],
+    "solves": 0,
+    "createdAt": "2026-08-28T18:00:00.000Z"
+  },
+  {
+    "id": "demo06",
+    "title": "Packet Sniffer",
+    "category": "Forensics",
+    "description": "We captured some suspicious network traffic. Hidden within the packet capture file is a secret flag. Download the PCAP file and analyze it with Wireshark or a similar tool. Look for unusual HTTP requests or hidden data in the TCP streams.",
+    "difficulty": "hard",
+    "points": 300,
+    "flag": "flag{pcap_4n4lys1s_pr0}",
+    "flagHash": "c780f8b426cc0465fcb46210fabdad81904be2c41e579b6b6fa31f88856e01f7",
+    "fileUrl": "",
+    "websiteUrl": "",
+    "author": "NetDetective",
+    "hints": [
+      "Use Wireshark to open the file",
+      "Follow the TCP streams",
+      "Look at HTTP request headers"
+    ],
+    "solves": 0,
+    "createdAt": "2026-08-28T18:00:00.000Z"
+  }
+]

@@ -1,0 +1,3182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚑ CYBERFLAGS — Capture The Flag Arena</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚩</text></svg>">
+    <style>
+        /* ═══════════════════════════════════════════════════════════════════
+           FONTS
+           ═══════════════════════════════════════════════════════════════════ */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+        /* ═══════════════════════════════════════════════════════════════════
+           CSS CUSTOM PROPERTIES (THEME)
+           ═══════════════════════════════════════════════════════════════════ */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #0f0f1a;
+            --bg-tertiary: #141428;
+            --bg-card: #12121f;
+            --bg-card-hover: #1a1a30;
+            --bg-input: #0d0d1a;
+            --bg-modal: rgba(5, 5, 15, 0.96);
+
+            --neon-green: #00ff88;
+            --neon-green-dim: #00cc6a;
+            --neon-green-glow: rgba(0, 255, 136, 0.3);
+            --neon-blue: #00d4ff;
+            --neon-blue-dim: #00a8cc;
+            --neon-blue-glow: rgba(0, 212, 255, 0.3);
+            --neon-purple: #b44dff;
+            --neon-purple-dim: #9933dd;
+            --neon-purple-glow: rgba(180, 77, 255, 0.3);
+            --neon-red: #ff3366;
+            --neon-red-dim: #cc2952;
+            --neon-red-glow: rgba(255, 51, 102, 0.3);
+            --neon-orange: #ff8800;
+            --neon-orange-dim: #cc6d00;
+            --neon-orange-glow: rgba(255, 136, 0, 0.3);
+            --neon-yellow: #ffdd00;
+            --neon-cyan: #00ffd5;
+            --neon-pink: #ff00aa;
+
+            --text-primary: #e8e8f0;
+            --text-secondary: #a0a0b8;
+            --text-muted: #606078;
+            --text-dim: #44445a;
+
+            --border-color: #1e1e3a;
+            --border-glow: rgba(0, 255, 136, 0.15);
+
+            --gradient-green: linear-gradient(135deg, #00ff88, #00cc6a);
+            --gradient-blue: linear-gradient(135deg, #00d4ff, #0088cc);
+            --gradient-purple: linear-gradient(135deg, #b44dff, #7722cc);
+            --gradient-red: linear-gradient(135deg, #ff3366, #cc1144);
+            --gradient-card: linear-gradient(145deg, #141428, #0f0f1a);
+
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+            --shadow-neon-green: 0 0 20px rgba(0, 255, 136, 0.25), 0 0 40px rgba(0, 255, 136, 0.1);
+            --shadow-neon-blue: 0 0 20px rgba(0, 212, 255, 0.25), 0 0 40px rgba(0, 212, 255, 0.1);
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-green-dim);
+        }
+
+        ::selection {
+            background: var(--neon-green);
+            color: var(--bg-primary);
+        }
+
+        a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        a:hover {
+            color: var(--neon-green);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           MATRIX RAIN CANVAS
+           ═══════════════════════════════════════════════════════════════════ */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           SCREEN SYSTEM — STRICT VIEW SWITCHING
+           (Fixes issue where intro screen remained visible)
+           ═══════════════════════════════════════════════════════════════════ */
+        .screen {
+            display: none !important;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .screen.active {
+            display: block !important;
+            animation: screenFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        #intro-screen.active {
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        @keyframes screenFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           INTRO / LANDING SCREEN
+           ═══════════════════════════════════════════════════════════════════ */
+        .intro-logo-section {
+            margin-bottom: 2.5rem;
+            animation: introFloat 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes introFloat {
+            from { transform: translateY(-8px); }
+            to   { transform: translateY(8px); }
+        }
+
+        .intro-icon {
+            font-size: 5rem;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+            filter: drop-shadow(0 0 35px rgba(0, 255, 136, 0.6));
+        }
+
+        .intro-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.2rem, 6.5vw, 4.8rem);
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue), var(--neon-purple), var(--neon-green));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s linear infinite;
+        }
+
+        @keyframes gradientShift {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        .intro-subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.9rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .intro-tagline {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--neon-green-dim);
+            margin-top: 1rem;
+            padding: 0.5rem 1.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: rgba(0, 255, 136, 0.04);
+            display: inline-block;
+        }
+        .intro-tagline .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .intro-divider {
+            width: 320px;
+            max-width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-green-dim), transparent);
+            margin: 2.2rem 0;
+        }
+
+        .intro-prompt {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            letter-spacing: 0.15em;
+        }
+
+        .intro-buttons {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 850px;
+        }
+
+        .intro-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 2.4rem 2.8rem;
+            min-width: 280px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            overflow: hidden;
+            text-align: center;
+        }
+        .intro-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+            transition: left 0.6s ease;
+        }
+        .intro-btn:hover::before {
+            left: 100%;
+        }
+
+        .intro-btn.admin-btn:hover {
+            border-color: var(--neon-red);
+            box-shadow: var(--shadow-md), 0 0 30px rgba(255, 51, 102, 0.25);
+            transform: translateY(-4px);
+        }
+        .intro-btn.anon-btn:hover {
+            border-color: var(--neon-green);
+            box-shadow: var(--shadow-md), var(--shadow-neon-green);
+            transform: translateY(-4px);
+        }
+
+        .intro-btn-icon { font-size: 3rem; }
+        .intro-btn-label {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+        .intro-btn-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            max-width: 220px;
+        }
+        .admin-btn .intro-btn-label { color: var(--neon-red); }
+        .anon-btn .intro-btn-label { color: var(--neon-green); }
+
+        .intro-footer {
+            margin-top: 3.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .intro-footer .version { color: var(--neon-green-dim); }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ADMIN LOGIN MODAL
+           ═══════════════════════════════════════════════════════════════════ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--bg-modal);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+            animation: modalFadeIn 0.25s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .modal-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.8rem;
+            max-width: 450px;
+            width: 100%;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes modalSlideIn {
+            from { transform: translateY(30px) scale(0.96); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+            line-height: 1;
+        }
+        .modal-close:hover { color: var(--neon-red); }
+
+        .modal-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--neon-red);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .modal-desc {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group { margin-bottom: 1.4rem; }
+        .form-label {
+            display: block;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.74rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .form-input:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 3px var(--neon-green-glow);
+        }
+        .form-input.error {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 0 3px var(--neon-red-glow);
+            animation: inputShake 0.4s ease;
+        }
+        @keyframes inputShake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-6px); }
+            40%      { transform: translateX(6px); }
+            60%      { transform: translateX(-4px); }
+            80%      { transform: translateX(4px); }
+        }
+
+        .form-error {
+            color: var(--neon-red);
+            font-size: 0.78rem;
+            margin-top: 0.35rem;
+            font-family: 'Share Tech Mono', monospace;
+            display: none;
+        }
+        .form-error.visible {
+            display: block;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           BUTTONS
+           ═══════════════════════════════════════════════════════════════════ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.4rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+        }
+        .btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-primary {
+            background: var(--gradient-green);
+            color: var(--bg-primary);
+        }
+        .btn-primary:hover {
+            box-shadow: var(--shadow-neon-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--gradient-red);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            border-color: var(--neon-blue);
+            box-shadow: var(--shadow-neon-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--neon-green);
+            border: 1.5px solid var(--neon-green-dim);
+        }
+        .btn-outline:hover {
+            background: rgba(0, 255, 136, 0.08);
+            box-shadow: var(--shadow-neon-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-sync {
+            background: linear-gradient(135deg, #00d4ff, #0077ff);
+            color: #fff;
+        }
+        .btn-sync:hover {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 0.45rem 0.9rem;
+            font-size: 0.68rem;
+        }
+        .btn-lg {
+            padding: 0.95rem 2.2rem;
+            font-size: 0.88rem;
+        }
+        .btn-block { width: 100%; }
+        .btn-icon {
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           NAVBAR
+           ═══════════════════════════════════════════════════════════════════ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .nav-brand-icon { font-size: 1.5rem; }
+        .nav-brand-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.1em;
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1.1rem;
+            border-radius: var(--radius-sm);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: 1px solid transparent;
+            background: none;
+            text-transform: uppercase;
+        }
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .nav-tab.active {
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.06);
+            border-color: var(--neon-green-dim);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .nav-sync-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.68rem;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            color: var(--neon-blue);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .nav-sync-badge:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: var(--neon-blue);
+        }
+
+        .nav-role-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.05em;
+        }
+        .nav-role-badge.admin {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            color: var(--neon-red);
+        }
+        .nav-role-badge.anon {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: var(--neon-green);
+        }
+
+        .nav-logout {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: 0.05em;
+        }
+        .nav-logout:hover {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           MAIN CONTENT
+           ═══════════════════════════════════════════════════════════════════ */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           STATS BAR
+           ═══════════════════════════════════════════════════════════════════ */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.2rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all var(--transition-normal);
+        }
+        .stat-card:hover {
+            border-color: rgba(0, 255, 136, 0.2);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .stat-icon.green  { background: rgba(0, 255, 136, 0.1); }
+        .stat-icon.blue   { background: rgba(0, 212, 255, 0.1); }
+        .stat-icon.purple { background: rgba(180, 77, 255, 0.1); }
+        .stat-icon.orange { background: rgba(255, 136, 0, 0.1); }
+
+        .stat-info { flex: 1; }
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+        .stat-label {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           SECTION HEADERS & FILTERS
+           ═══════════════════════════════════════════════════════════════════ */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section-title .accent { color: var(--neon-green); }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 220px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.5rem;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .search-box input:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 3px var(--neon-green-glow);
+        }
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        .filter-chip {
+            padding: 0.45rem 0.95rem;
+            border-radius: 20px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .filter-chip:hover,
+        .filter-chip.active {
+            border-color: var(--neon-green-dim);
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.08);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           CHALLENGE CARDS GRID
+           ═══════════════════════════════════════════════════════════════════ */
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.3rem;
+        }
+
+        .challenge-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+        }
+        .challenge-card[data-difficulty="easy"]::before    { background: var(--gradient-green); }
+        .challenge-card[data-difficulty="medium"]::before  { background: linear-gradient(90deg, var(--neon-orange), var(--neon-yellow)); }
+        .challenge-card[data-difficulty="hard"]::before    { background: var(--gradient-red); }
+        .challenge-card[data-difficulty="insane"]::before  { background: var(--gradient-purple); }
+
+        .challenge-card:hover {
+            border-color: rgba(0, 255, 136, 0.25);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-top-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-category {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 3px;
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--neon-blue);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .card-points {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--neon-yellow);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .card-difficulty {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 0.22rem 0.65rem;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        .card-difficulty.easy   { background: rgba(0,255,136,0.1); color: var(--neon-green); border: 1px solid rgba(0,255,136,0.25); }
+        .card-difficulty.medium { background: rgba(255,136,0,0.1); color: var(--neon-orange); border: 1px solid rgba(255,136,0,0.25); }
+        .card-difficulty.hard   { background: rgba(255,51,102,0.1); color: var(--neon-red); border: 1px solid rgba(255,51,102,0.25); }
+        .card-difficulty.insane { background: rgba(180,77,255,0.1); color: var(--neon-purple); border: 1px solid rgba(180,77,255,0.25); }
+
+        .card-solves {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .card-author {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-left: auto;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .card-actions .btn {
+            flex: 1;
+            min-width: 90px;
+            font-size: 0.68rem;
+            padding: 0.5rem 0.6rem;
+        }
+
+        .card-flag-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .card-flag-form input {
+            flex: 1;
+            padding: 0.6rem 0.8rem;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color var(--transition-fast);
+        }
+        .card-flag-form input:focus { border-color: var(--neon-green); }
+
+        .flag-result {
+            margin-top: 0.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem;
+            padding: 0.45rem 0.75rem;
+            border-radius: var(--radius-sm);
+            display: none;
+        }
+        .flag-result.correct {
+            display: block;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--neon-green);
+            border: 1px solid rgba(0, 255, 136, 0.25);
+            animation: flagCorrect 0.4s ease;
+        }
+        .flag-result.incorrect {
+            display: block;
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--neon-red);
+            border: 1px solid rgba(255, 51, 102, 0.25);
+            animation: inputShake 0.4s ease;
+        }
+        @keyframes flagCorrect {
+            0%   { transform: scale(0.96); opacity: 0; }
+            50%  { transform: scale(1.02); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .card-solved-badge {
+            position: absolute;
+            top: 12px;
+            right: -32px;
+            background: var(--gradient-green);
+            color: var(--bg-primary);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 0.25rem 2.6rem;
+            transform: rotate(45deg);
+            letter-spacing: 0.1em;
+            z-index: 2;
+        }
+
+        .card-hints-area { margin-top: 0.6rem; }
+        .hint-bubble {
+            background: rgba(0, 212, 255, 0.06);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.8rem;
+            font-size: 0.82rem;
+            color: var(--neon-blue);
+            margin-top: 0.5rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           ADMIN: MANAGE & FORM
+           ═══════════════════════════════════════════════════════════════════ */
+        .admin-box {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-box-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color var(--transition-fast);
+        }
+        .form-textarea:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 3px var(--neon-green-glow);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300ff88'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        .form-select:focus { border-color: var(--neon-green); }
+        .form-select option { background: var(--bg-secondary); }
+
+        .form-hint {
+            font-size: 0.73rem;
+            color: var(--text-dim);
+            margin-top: 0.35rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .hint-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .hint-row input { flex: 1; }
+
+        .admin-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        .admin-table thead th {
+            background: var(--bg-tertiary);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0.9rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .admin-table tbody tr {
+            border-bottom: 1px solid rgba(30, 30, 58, 0.5);
+            transition: background var(--transition-fast);
+        }
+        .admin-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .admin-table td {
+            padding: 0.8rem 1rem;
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+
+        .admin-table .flag-cell {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--neon-green-dim);
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           CLOUD GITHUB SYNC BANNER & TAB
+           ═══════════════════════════════════════════════════════════════════ */
+        .github-sync-banner {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(0, 119, 255, 0.04));
+            border: 1.5px solid rgba(0, 212, 255, 0.3);
+            border-radius: var(--radius-md);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .sync-info-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .sync-icon-large {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .sync-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+        .sync-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
+        .sync-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .sync-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sync-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .step-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+        }
+        .step-num {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--neon-blue);
+            margin-bottom: 0.5rem;
+        }
+        .step-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           SCOREBOARD & ACTIVITY
+           ═══════════════════════════════════════════════════════════════════ */
+        .leaderboard-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table thead th {
+            background: var(--bg-tertiary);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            padding: 0.9rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .leaderboard-table tbody tr {
+            border-bottom: 1px solid rgba(30, 30, 58, 0.5);
+            transition: background var(--transition-fast);
+        }
+        .leaderboard-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+        .leaderboard-table td {
+            padding: 0.8rem 1rem;
+            font-size: 0.88rem;
+        }
+        .rank-badge {
+            font-family: 'Orbitron', monospace;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+        .rank-badge.gold   { color: #ffd700; }
+        .rank-badge.silver { color: #c0c0c0; }
+        .rank-badge.bronze { color: #cd7f32; }
+
+        .activity-feed {
+            max-height: 450px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+        }
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.8rem 1.1rem;
+            border-bottom: 1px solid rgba(30, 30, 58, 0.5);
+            font-size: 0.84rem;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        .activity-dot.green  { background: var(--neon-green); }
+        .activity-dot.blue   { background: var(--neon-blue); }
+        .activity-dot.red    { background: var(--neon-red); }
+        .activity-dot.purple { background: var(--neon-purple); }
+        .activity-text { color: var(--text-secondary); flex: 1; }
+        .activity-time {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           TOAST NOTIFICATIONS & CONFETTI
+           ═══════════════════════════════════════════════════════════════════ */
+        .toast-container {
+            position: fixed;
+            top: 75px;
+            right: 1.5rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.85rem 1.2rem;
+            border-radius: var(--radius-sm);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.84rem;
+            min-width: 280px;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg);
+            animation: toastSlideIn 0.35s ease, toastFadeOut 0.35s ease 4s forwards;
+            border-left: 4px solid;
+            background: var(--bg-secondary);
+        }
+        .toast.success {
+            border-left-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+        .toast.error {
+            border-left-color: var(--neon-red);
+            color: var(--neon-red);
+        }
+        .toast.info {
+            border-left-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        @keyframes toastSlideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toastFadeOut {
+            to { transform: translateX(120%); opacity: 0; }
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3000;
+        }
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            animation: confettiFall 1.5s ease-out forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg) scale(0); opacity: 0; }
+        }
+
+        /* Scanlines */
+        .scanlines::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.025) 2px,
+                rgba(0, 0, 0, 0.025) 4px
+            );
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 1rem; height: 56px; }
+            .nav-center { display: none; }
+            .mobile-menu-btn { display: block !important; }
+            .mobile-nav {
+                display: none;
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
+                padding: 1rem;
+                z-index: 99;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .mobile-nav.open { display: flex; }
+            .mobile-nav .nav-tab { width: 100%; text-align: center; padding: 0.7rem; }
+            .main-content { padding: 1rem; }
+            .challenges-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+        .empty-state-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.5; }
+        .empty-state-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .empty-state-desc { font-size: 0.9rem; max-width: 420px; margin: 0 auto; }
+    </style>
+</head>
+<body class="scanlines">
+
+    <!-- MATRIX RAIN BACKGROUND -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- TOASTS & CONFETTI -->
+    <div class="toast-container" id="toast-container"></div>
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         INTRO SCREEN
+         (Active by default. Completely disappears upon signing in)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div id="intro-screen" class="screen active">
+        <div class="intro-logo-section">
+            <span class="intro-icon">🚩</span>
+            <h1 class="intro-title">CYBERFLAGS</h1>
+            <p class="intro-subtitle">Global Capture The Flag Arena</p>
+            <div class="intro-tagline">
+                <span id="typing-target"></span><span class="cursor-blink">█</span>
+            </div>
+        </div>
+
+        <div class="intro-divider"></div>
+
+        <p class="intro-prompt">IDENTIFY YOUR ACCESS LEVEL</p>
+
+        <div class="intro-buttons">
+            <button class="intro-btn admin-btn" onclick="showAdminLogin()">
+                <span class="intro-btn-icon">🔐</span>
+                <span class="intro-btn-label">I AM THE ADMIN</span>
+                <span class="intro-btn-desc">Create challenges, edit flags, and publish live to GitHub</span>
+            </button>
+            <button class="intro-btn anon-btn" onclick="enterAsAnonymous()">
+                <span class="intro-btn-icon">👤</span>
+                <span class="intro-btn-label">I AM ANONYMOUS</span>
+                <span class="intro-btn-desc">Browse challenges, download files, capture flags worldwide</span>
+            </button>
+        </div>
+
+        <div class="intro-footer">
+            <span>CYBERFLAGS ARENA</span> · <span class="version">v3.5.0</span> · <span>GITHUB HOSTED READY</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ADMIN LOGIN MODAL
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div id="admin-login-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeAdminLogin()">&times;</button>
+            <div class="modal-title">🔐 ADMIN ACCESS</div>
+            <p class="modal-desc">Enter your credentials to manage challenges and arena settings.</p>
+
+            <form onsubmit="attemptAdminLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="admin-username" class="form-input" placeholder="e.g. admin" autocomplete="off" autofocus>
+                    <div class="form-error" id="username-error">Username must be "admin"</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">PIN Code</label>
+                    <input type="password" id="admin-pin" class="form-input" placeholder="e.g. 2010" autocomplete="off" maxlength="10">
+                    <div class="form-error" id="pin-error">PIN must be "2010"</div>
+                </div>
+                <div class="form-group">
+                    <div class="form-error" id="login-error">⚠ Access denied. Invalid username or PIN.</div>
+                </div>
+                <button type="submit" class="btn btn-danger btn-block btn-lg">
+                    🔓 AUTHENTICATE & ENTER
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CONFIRM DIALOG
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div id="confirm-dialog" class="modal-overlay">
+        <div class="modal-box" style="max-width: 380px; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <div style="color: var(--text-secondary); margin-bottom: 1.5rem;" id="confirm-msg">Are you sure?</div>
+            <div style="display: flex; gap: 0.75rem; justify-content: center;">
+                <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+                <button class="btn btn-danger" id="confirm-yes-btn" onclick="confirmAction()">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CHALLENGE DETAIL MODAL
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div id="detail-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 640px; padding: 2.2rem;">
+            <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         MAIN APP SCREEN (DASHBOARD)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div id="app-screen" class="screen">
+
+        <!-- NAVBAR -->
+        <nav class="navbar">
+            <div class="nav-brand" onclick="goToIntro()">
+                <span class="nav-brand-icon">🚩</span>
+                <span class="nav-brand-text">CYBERFLAGS</span>
+            </div>
+
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+
+            <div class="nav-center" id="nav-tabs"></div>
+
+            <div class="nav-right">
+                <div class="nav-sync-badge" id="nav-sync-badge" onclick="refreshDataSource()" title="Click to fetch latest challenges">
+                    <span id="sync-indicator">🌐</span>
+                    <span id="sync-text">Live Sync</span>
+                </div>
+                <span class="nav-role-badge" id="nav-role-badge"></span>
+                <button class="nav-logout" onclick="goToIntro()" title="Sign out and return to intro">⏻ EXIT</button>
+            </div>
+        </nav>
+
+        <!-- MOBILE NAV -->
+        <div class="mobile-nav" id="mobile-nav"></div>
+
+        <!-- CONTENT -->
+        <div class="main-content" id="main-content"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         JAVASCRIPT LOGIC
+         ═══════════════════════════════════════════════════════════════════ -->
+    <script>
+    /* ─── CONSTANTS & CONFIG ───────────────────────────────────────── */
+    const ADMIN_USERNAME = 'admin';
+    const ADMIN_PIN = '2010';
+    const STORAGE_KEY = 'cyberflags_data';
+    const SOLVED_KEY = 'cyberflags_solved';
+    const LOG_KEY = 'cyberflags_log';
+    const SCORE_KEY = 'cyberflags_scores';
+    const GH_CONFIG_KEY = 'cyberflags_gh_config';
+
+    let currentRole = null;       // 'admin' | 'anon'
+    let currentTab = 'challenges';
+    let editingChallengeId = null;
+    let confirmCallback = null;
+    let filterCategory = 'all';
+    let filterDifficulty = 'all';
+    let searchQuery = '';
+    let isDataSourceRemote = false;
+
+    /* ─── SHA-256 HASHING HELPER (For Flag Security) ──────────────── */
+    async function sha256(message) {
+        if (!message) return '';
+        try {
+            const msgBuffer = new TextEncoder().encode(message.trim());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {
+            // Fallback for non-crypto contexts
+            return message.trim();
+        }
+    }
+
+    /* ─── LOCAL / STORAGE HELPERS ─────────────────────────────────── */
+    function getChallenges() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        } catch { return []; }
+    }
+
+    function saveChallenges(arr) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
+
+    function getSolved() {
+        try {
+            return JSON.parse(localStorage.getItem(SOLVED_KEY)) || [];
+        } catch { return []; }
+    }
+
+    function saveSolved(arr) {
+        localStorage.setItem(SOLVED_KEY, JSON.stringify(arr));
+    }
+
+    function getLog() {
+        try {
+            return JSON.parse(localStorage.getItem(LOG_KEY)) || [];
+        } catch { return []; }
+    }
+
+    function addLog(text, type = 'green') {
+        const log = getLog();
+        log.unshift({ text, type, time: new Date().toISOString() });
+        if (log.length > 150) log.length = 150;
+        localStorage.setItem(LOG_KEY, JSON.stringify(log));
+    }
+
+    function getScores() {
+        try {
+            return JSON.parse(localStorage.getItem(SCORE_KEY)) || {};
+        } catch { return {}; }
+    }
+
+    function addScore(challengeId, points) {
+        const scores = getScores();
+        const sessionId = getSessionId();
+        if (!scores[sessionId]) {
+            scores[sessionId] = { total: 0, solved: [], name: 'Anonymous#' + sessionId.slice(0, 4) };
+        }
+        if (!scores[sessionId].solved.includes(challengeId)) {
+            scores[sessionId].solved.push(challengeId);
+            scores[sessionId].total += points;
+        }
+        localStorage.setItem(SCORE_KEY, JSON.stringify(scores));
+    }
+
+    function getSessionId() {
+        let sid = sessionStorage.getItem('cyberflags_session');
+        if (!sid) {
+            sid = Math.random().toString(36).slice(2, 8);
+            sessionStorage.setItem('cyberflags_session', sid);
+        }
+        return sid;
+    }
+
+    function generateId() {
+        return 'c_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    }
+
+    function getGitHubConfig() {
+        try {
+            return JSON.parse(localStorage.getItem(GH_CONFIG_KEY)) || {
+                repo: '',
+                branch: 'main',
+                token: '',
+                autoSync: false,
+                stripPlainFlags: false
+            };
+        } catch {
+            return { repo: '', branch: 'main', token: '', autoSync: false, stripPlainFlags: false };
+        }
+    }
+
+    function saveGitHubConfig(cfg) {
+        localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(cfg));
+    }
+
+    /* ─── FETCH CHALLENGES (FOR GITHUB PAGES & GLOBAL USERS) ──────── */
+    async function loadGlobalChallenges() {
+        try {
+            // Cache-busting URL parameter so browser/CDN always gets the freshest version
+            const res = await fetch(`./challenges.json?_t=${Date.now()}`, { cache: 'no-store' });
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    // Merge or update local with remote
+                    const currentLocal = getChallenges();
+                    // If local is empty or remote has data, adopt remote
+                    if (currentLocal.length === 0) {
+                        saveChallenges(data);
+                    } else {
+                        // Preserve plain flags in local admin storage if remote has stripped them
+                        data.forEach(rc => {
+                            const localMatch = currentLocal.find(lc => lc.id === rc.id);
+                            if (localMatch && localMatch.flag && !rc.flag) {
+                                rc.flag = localMatch.flag;
+                            }
+                        });
+                        saveChallenges(data);
+                    }
+                    isDataSourceRemote = true;
+                    updateSyncBadge(true);
+                    return;
+                }
+            }
+        } catch (err) {
+            console.log('Local/file mode or network fetch fallback:', err);
+        }
+
+        // Fallback: use localStorage or default starter challenges
+        if (getChallenges().length === 0) {
+            seedInitialDemo();
+        }
+        isDataSourceRemote = false;
+        updateSyncBadge(false);
+    }
+
+    function updateSyncBadge(isRemote) {
+        const badge = document.getElementById('nav-sync-badge');
+        const indicator = document.getElementById('sync-indicator');
+        const text = document.getElementById('sync-text');
+        if (!badge) return;
+
+        if (isRemote) {
+            indicator.textContent = '🌐';
+            text.textContent = 'GitHub Live';
+            badge.style.borderColor = 'rgba(0, 255, 136, 0.4)';
+            badge.style.color = 'var(--neon-green)';
+            badge.title = 'Serving challenges globally from challenges.json';
+        } else {
+            indicator.textContent = '💾';
+            text.textContent = 'Local Mode';
+            badge.style.borderColor = 'rgba(0, 212, 255, 0.4)';
+            badge.style.color = 'var(--neon-blue)';
+            badge.title = 'Running locally or file://. Sync to GitHub to publish worldwide.';
+        }
+    }
+
+    async function refreshDataSource() {
+        showToast('Refreshing challenges from repository...', 'info');
+        await loadGlobalChallenges();
+        renderCurrentTab();
+        showToast('Refreshed!', 'success');
+    }
+
+    /* ─── MATRIX RAIN BACKGROUND ──────────────────────────────────── */
+    (function initMatrix() {
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, columns, drops;
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            columns = Math.floor(w / 18);
+            drops = Array(columns).fill(1);
+        }
+
+        const chars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#$%^&*()_+=~[]{}|;:,.<>?/フラグ';
+
+        function draw() {
+            ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#00ff88';
+            ctx.font = '14px "Share Tech Mono", monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * 18, drops[i] * 18);
+                if (drops[i] * 18 > h && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+        setInterval(draw, 50);
+    })();
+
+    /* ─── TYPING ANIMATION ────────────────────────────────────────── */
+    (function typewriter() {
+        const phrases = [
+            'Deploy anywhere. Solve everywhere.',
+            'Hosted on GitHub Pages worldwide.',
+            'Break it to make it.',
+            'Every flag has a cipher.',
+            'Think like an attacker.',
+            '01000011 01010100 01000110',
+            'Find the flag. Earn the glory.'
+        ];
+        const el = document.getElementById('typing-target');
+        let pi = 0, ci = 0, deleting = false;
+
+        function tick() {
+            const phrase = phrases[pi];
+            if (!deleting) {
+                el.textContent = phrase.slice(0, ci + 1);
+                ci++;
+                if (ci >= phrase.length) {
+                    deleting = true;
+                    setTimeout(tick, 2200);
+                    return;
+                }
+                setTimeout(tick, 65 + Math.random() * 35);
+            } else {
+                el.textContent = phrase.slice(0, ci);
+                ci--;
+                if (ci <= 0) {
+                    deleting = false;
+                    pi = (pi + 1) % phrases.length;
+                    setTimeout(tick, 400);
+                    return;
+                }
+                setTimeout(tick, 30);
+            }
+        }
+        tick();
+    })();
+
+    /* ─── SCREEN NAVIGATION & FIX ─────────────────────────────────── */
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => {
+            s.classList.remove('active');
+            s.style.setProperty('display', 'none', 'important');
+        });
+        const target = document.getElementById(id);
+        if (target) {
+            target.classList.add('active');
+            if (id === 'intro-screen') {
+                target.style.setProperty('display', 'flex', 'important');
+            } else {
+                target.style.setProperty('display', 'block', 'important');
+            }
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    function goToIntro() {
+        currentRole = null;
+        sessionStorage.removeItem('cyberflags_role');
+        showScreen('intro-screen');
+    }
+
+    /* ─── AUTHENTICATION & LOGIN ─────────────────────────────────── */
+    function showAdminLogin() {
+        document.getElementById('admin-login-modal').classList.add('active');
+        document.getElementById('admin-username').value = '';
+        document.getElementById('admin-pin').value = '';
+        clearLoginErrors();
+        setTimeout(() => document.getElementById('admin-username').focus(), 100);
+    }
+
+    function closeAdminLogin() {
+        document.getElementById('admin-login-modal').classList.remove('active');
+        clearLoginErrors();
+    }
+
+    function clearLoginErrors() {
+        ['username-error','pin-error','login-error'].forEach(id => {
+            document.getElementById(id).classList.remove('visible');
+        });
+        document.getElementById('admin-username').classList.remove('error');
+        document.getElementById('admin-pin').classList.remove('error');
+    }
+
+    function attemptAdminLogin(e) {
+        e.preventDefault();
+        clearLoginErrors();
+        const u = document.getElementById('admin-username').value.trim();
+        const p = document.getElementById('admin-pin').value.trim();
+        let valid = true;
+
+        if (u !== ADMIN_USERNAME) {
+            document.getElementById('admin-username').classList.add('error');
+            document.getElementById('username-error').classList.add('visible');
+            valid = false;
+        }
+        if (p !== ADMIN_PIN) {
+            document.getElementById('admin-pin').classList.add('error');
+            document.getElementById('pin-error').classList.add('visible');
+            valid = false;
+        }
+        if (!valid) {
+            document.getElementById('login-error').classList.add('visible');
+            addLog('Failed admin login attempt', 'red');
+            return;
+        }
+
+        currentRole = 'admin';
+        sessionStorage.setItem('cyberflags_role', 'admin');
+        closeAdminLogin();
+        enterApp();
+        addLog('Admin authenticated successfully', 'purple');
+        showToast('Welcome, Administrator! Full arena control granted.', 'success');
+    }
+
+    function enterAsAnonymous() {
+        currentRole = 'anon';
+        sessionStorage.setItem('cyberflags_role', 'anon');
+        enterApp();
+        addLog('Anonymous challenger entered the arena', 'blue');
+        showToast('Welcome, Challenger! Capture flags & climb the board.', 'info');
+    }
+
+    function enterApp() {
+        // Strict screen transition: Intro screen disappears completely, dashboard appears
+        showScreen('app-screen');
+        buildNavTabs();
+        buildRoleBadge();
+        currentTab = 'challenges';
+        switchTab('challenges');
+        updateSyncBadge(isDataSourceRemote);
+    }
+
+    function buildNavTabs() {
+        const tabs = document.getElementById('nav-tabs');
+        const mobileTabs = document.getElementById('mobile-nav');
+        let html = '';
+        const items = [
+            { id: 'challenges', label: '🎯 Challenges', roles: ['admin', 'anon'] },
+            { id: 'scoreboard', label: '🏆 Scoreboard', roles: ['admin', 'anon'] },
+            { id: 'about', label: 'ℹ️ Rules & Info', roles: ['admin', 'anon'] },
+            { id: 'admin-manage', label: '⚙️ Manage Challenges', roles: ['admin'] },
+            { id: 'admin-github', label: '☁️ GitHub Sync', roles: ['admin'] },
+            { id: 'admin-activity', label: '📋 Activity Log', roles: ['admin'] },
+        ];
+        items.forEach(t => {
+            if (t.roles.includes(currentRole)) {
+                html += `<button class="nav-tab ${t.id === currentTab ? 'active' : ''}" data-tab="${t.id}" onclick="switchTab('${t.id}')">${t.label}</button>`;
+            }
+        });
+        tabs.innerHTML = html;
+        mobileTabs.innerHTML = html;
+    }
+
+    function buildRoleBadge() {
+        const badge = document.getElementById('nav-role-badge');
+        if (currentRole === 'admin') {
+            badge.className = 'nav-role-badge admin';
+            badge.innerHTML = '🔐 ADMIN';
+        } else {
+            badge.className = 'nav-role-badge anon';
+            badge.innerHTML = '👤 ANONYMOUS';
+        }
+    }
+
+    function toggleMobileMenu() {
+        document.getElementById('mobile-nav').classList.toggle('open');
+    }
+
+    function switchTab(tabId) {
+        currentTab = tabId;
+        document.querySelectorAll('.nav-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.tab === tabId);
+        });
+        document.getElementById('mobile-nav').classList.remove('open');
+        renderCurrentTab();
+    }
+
+    function renderCurrentTab() {
+        const content = document.getElementById('main-content');
+        switch(currentTab) {
+            case 'challenges':     content.innerHTML = renderChallengesTab(); break;
+            case 'scoreboard':     content.innerHTML = renderScoreboardTab(); break;
+            case 'about':          content.innerHTML = renderAboutTab(); break;
+            case 'admin-manage':   content.innerHTML = renderAdminManageTab(); break;
+            case 'admin-github':   content.innerHTML = renderAdminGitHubTab(); break;
+            case 'admin-activity': content.innerHTML = renderAdminActivityTab(); break;
+        }
+    }
+
+    /* ─── CHALLENGES TAB ──────────────────────────────────────────── */
+    function renderChallengesTab() {
+        const challenges = getChallenges();
+        const solved = getSolved();
+        const categories = [...new Set(challenges.map(c => c.category))];
+
+        let bannerHtml = '';
+        if (currentRole === 'admin') {
+            bannerHtml = `
+            <div class="github-sync-banner">
+                <div class="sync-info-left">
+                    <span class="sync-icon-large">☁️</span>
+                    <div>
+                        <div class="sync-title">ADMIN CONTROL: HOSTED CHALLENGES</div>
+                        <div class="sync-desc">Publish your latest changes to GitHub so anyone visiting worldwide sees them.</div>
+                    </div>
+                </div>
+                <div class="sync-actions">
+                    <button class="btn btn-sync btn-sm" onclick="switchTab('admin-github')">🚀 GitHub Sync Hub</button>
+                    <button class="btn btn-secondary btn-sm" onclick="downloadChallengesJson()">💾 Download JSON</button>
+                </div>
+            </div>`;
+        }
+
+        return `
+            ${bannerHtml}
+            ${renderStats(challenges, solved)}
+            ${renderFilterBar(categories)}
+            <div class="challenges-grid" id="challenges-grid">
+                ${renderChallengeCards(challenges, solved)}
+            </div>
+        `;
+    }
+
+    function renderStats(challenges, solved) {
+        const totalPts = challenges.reduce((s, c) => s + (parseInt(c.points) || 0), 0);
+        const earnedPts = challenges.filter(c => solved.includes(c.id)).reduce((s, c) => s + (parseInt(c.points) || 0), 0);
+        return `
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-icon green">🎯</div>
+                <div class="stat-info">
+                    <div class="stat-value">${challenges.length}</div>
+                    <div class="stat-label">Total Challenges</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">✅</div>
+                <div class="stat-info">
+                    <div class="stat-value">${solved.length}</div>
+                    <div class="stat-label">Flags Captured</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">⭐</div>
+                <div class="stat-info">
+                    <div class="stat-value">${earnedPts}</div>
+                    <div class="stat-label">Points Earned</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">🏅</div>
+                <div class="stat-info">
+                    <div class="stat-value">${totalPts}</div>
+                    <div class="stat-label">Total Available</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function renderFilterBar(categories) {
+        let catChips = `<span class="filter-chip ${filterCategory==='all'?'active':''}" onclick="setFilter('category','all')">All</span>`;
+        categories.forEach(c => {
+            catChips += `<span class="filter-chip ${filterCategory===c?'active':''}" onclick="setFilter('category','${escapeHtml(c)}')">${escapeHtml(c)}</span>`;
+        });
+
+        return `
+        <div class="filter-bar">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search challenges by title, category, description..." value="${escapeHtml(searchQuery)}" oninput="onSearch(this.value)">
+            </div>
+            ${catChips}
+        </div>
+        <div class="filter-bar" style="margin-top:-0.5rem;">
+            <span class="filter-chip ${filterDifficulty==='all'?'active':''}" onclick="setFilter('difficulty','all')">All Difficulties</span>
+            <span class="filter-chip ${filterDifficulty==='easy'?'active':''}" onclick="setFilter('difficulty','easy')">🟢 Easy</span>
+            <span class="filter-chip ${filterDifficulty==='medium'?'active':''}" onclick="setFilter('difficulty','medium')">🟠 Medium</span>
+            <span class="filter-chip ${filterDifficulty==='hard'?'active':''}" onclick="setFilter('difficulty','hard')">🔴 Hard</span>
+            <span class="filter-chip ${filterDifficulty==='insane'?'active':''}" onclick="setFilter('difficulty','insane')">🟣 Insane</span>
+        </div>`;
+    }
+
+    function renderChallengeCards(challenges, solved) {
+        let filtered = challenges.filter(c => {
+            if (filterCategory !== 'all' && c.category !== filterCategory) return false;
+            if (filterDifficulty !== 'all' && c.difficulty !== filterDifficulty) return false;
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                if (!c.title.toLowerCase().includes(q) &&
+                    !c.description.toLowerCase().includes(q) &&
+                    !c.category.toLowerCase().includes(q)) return false;
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            return `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-state-icon">🔍</div>
+                <div class="empty-state-title">No Challenges Found</div>
+                <div class="empty-state-desc">${challenges.length === 0 ? 'No challenges have been created yet. The admin can add new challenges in the Manage tab.' : 'No challenges matched your search filters.'}</div>
+            </div>`;
+        }
+
+        return filtered.map(c => {
+            const isSolved = solved.includes(c.id);
+            const solveCount = c.solves || 0;
+            let actionsHtml = '';
+
+            if (c.fileUrl) {
+                actionsHtml += `<a href="${escapeHtml(c.fileUrl)}" target="_blank" download class="btn btn-secondary btn-sm">📥 Download File</a>`;
+            }
+            if (c.websiteUrl) {
+                actionsHtml += `<a href="${escapeHtml(c.websiteUrl)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">🌐 Open Website</a>`;
+            }
+            actionsHtml += `<button class="btn btn-secondary btn-sm" onclick="openDetailModal('${c.id}')">🔍 Details</button>`;
+
+            let hintsHtml = '';
+            if (c.hints && c.hints.length > 0) {
+                hintsHtml = `<div class="card-hints-area">`;
+                c.hints.forEach((h, i) => {
+                    const hintKey = `hint_${c.id}_${i}`;
+                    const isUnlocked = localStorage.getItem(hintKey) === '1';
+                    if (isUnlocked) {
+                        hintsHtml += `<div class="hint-bubble">💡 Hint ${i+1}: ${escapeHtml(h)}</div>`;
+                    } else {
+                        hintsHtml += `<button class="btn btn-sm btn-outline" style="margin:0.2rem 0.2rem 0 0;" onclick="unlockHint('${c.id}', ${i})">🔒 Hint ${i+1}</button> `;
+                    }
+                });
+                hintsHtml += `</div>`;
+            }
+
+            return `
+            <div class="challenge-card" data-difficulty="${c.difficulty}" data-id="${c.id}">
+                ${isSolved ? '<div class="card-solved-badge">SOLVED</div>' : ''}
+                <div class="card-top-row">
+                    <span class="card-category">${escapeHtml(c.category)}</span>
+                    <span class="card-points">⭐ ${c.points} pts</span>
+                </div>
+                <div class="card-title">${escapeHtml(c.title)}</div>
+                <div class="card-description">${escapeHtml(c.description).substring(0, 190)}${c.description.length > 190 ? '...' : ''}</div>
+                <div class="card-meta">
+                    <span class="card-difficulty ${c.difficulty}">${c.difficulty.toUpperCase()}</span>
+                    <span class="card-solves">👥 ${solveCount} solve${solveCount !== 1 ? 's' : ''}</span>
+                    ${c.author ? `<span class="card-author">by ${escapeHtml(c.author)}</span>` : ''}
+                </div>
+                <div class="card-actions">${actionsHtml}</div>
+                ${!isSolved ? `
+                <div class="card-flag-form">
+                    <input type="text" id="flag-input-${c.id}" placeholder="Enter flag (e.g. flag{...})" onkeydown="if(event.key==='Enter')submitFlag('${c.id}')">
+                    <button class="btn btn-primary btn-sm" onclick="submitFlag('${c.id}')">Submit</button>
+                </div>
+                <div class="flag-result" id="flag-result-${c.id}"></div>
+                ` : `<div class="flag-result correct" style="display:block;">✅ FLAG CAPTURED! Well done, hacker.</div>`}
+                ${hintsHtml}
+            </div>`;
+        }).join('');
+    }
+
+    function setFilter(type, value) {
+        if (type === 'category') filterCategory = value;
+        if (type === 'difficulty') filterDifficulty = value;
+        renderCurrentTab();
+    }
+
+    function onSearch(value) {
+        searchQuery = value;
+        const challenges = getChallenges();
+        const solved = getSolved();
+        document.getElementById('challenges-grid').innerHTML = renderChallengeCards(challenges, solved);
+    }
+
+    /* ─── FLAG SUBMISSION WITH SHA-256 MATCHING ───────────────────── */
+    async function submitFlag(challengeId) {
+        const input = document.getElementById(`flag-input-${challengeId}`);
+        const result = document.getElementById(`flag-result-${challengeId}`);
+        const userFlag = input.value.trim();
+        const challenges = getChallenges();
+        const challenge = challenges.find(c => c.id === challengeId);
+
+        if (!userFlag) {
+            result.className = 'flag-result incorrect';
+            result.textContent = '⚠ Please enter a flag first.';
+            result.style.display = 'block';
+            return;
+        }
+
+        if (!challenge) return;
+
+        // Verify either against plain flag or SHA-256 hash
+        const userHash = await sha256(userFlag);
+        const isMatch = (challenge.flag && userFlag === challenge.flag) ||
+                        (challenge.flagHash && userHash === challenge.flagHash);
+
+        if (isMatch) {
+            result.className = 'flag-result correct';
+            result.textContent = '✅ CORRECT! Flag captured! 🎉';
+            result.style.display = 'block';
+
+            const solved = getSolved();
+            if (!solved.includes(challengeId)) {
+                solved.push(challengeId);
+                saveSolved(solved);
+
+                challenge.solves = (challenge.solves || 0) + 1;
+                saveChallenges(challenges);
+
+                addScore(challengeId, parseInt(challenge.points) || 0);
+                addLog(`Flag captured: "${challenge.title}" (+${challenge.points} pts)`, 'green');
+            }
+
+            spawnConfetti();
+            showToast(`🎉 Correct flag for "${challenge.title}" (+${challenge.points} pts)!`, 'success');
+            setTimeout(() => renderCurrentTab(), 1400);
+        } else {
+            result.className = 'flag-result incorrect';
+            result.textContent = '❌ INCORRECT FLAG. Keep digging!';
+            result.style.display = 'block';
+            addLog(`Wrong flag submitted for "${challenge.title}"`, 'red');
+        }
+    }
+
+    function unlockHint(challengeId, hintIndex) {
+        const hintKey = `hint_${challengeId}_${hintIndex}`;
+        localStorage.setItem(hintKey, '1');
+        addLog(`Hint ${hintIndex+1} unlocked for challenge`, 'blue');
+        showToast('Hint unlocked!', 'info');
+        renderCurrentTab();
+    }
+
+    /* ─── CHALLENGE DETAIL MODAL ──────────────────────────────────── */
+    function openDetailModal(challengeId) {
+        const challenges = getChallenges();
+        const challenge = challenges.find(c => c.id === challengeId);
+        if (!challenge) return;
+        const solved = getSolved();
+        const isSolved = solved.includes(challengeId);
+
+        let hintsHtml = '';
+        if (challenge.hints && challenge.hints.length > 0) {
+            hintsHtml = `<div style="margin-top:1.2rem;"><h4>💡 HINTS</h4>`;
+            challenge.hints.forEach((h, i) => {
+                const hintKey = `hint_${challengeId}_${i}`;
+                const isUnlocked = localStorage.getItem(hintKey) === '1';
+                if (isUnlocked) {
+                    hintsHtml += `<div class="hint-bubble">Hint ${i+1}: ${escapeHtml(h)}</div>`;
+                } else {
+                    hintsHtml += `<button class="btn btn-sm btn-outline" style="margin:0.3rem 0.3rem 0 0;" onclick="unlockHint('${challengeId}', ${i}); openDetailModal('${challengeId}');">🔒 Unlock Hint ${i+1}</button>`;
+                }
+            });
+            hintsHtml += `</div>`;
+        }
+
+        let actionsHtml = '';
+        if (challenge.fileUrl) {
+            actionsHtml += `<a href="${escapeHtml(challenge.fileUrl)}" target="_blank" download class="btn btn-secondary">📥 Download Challenge File</a>`;
+        }
+        if (challenge.websiteUrl) {
+            actionsHtml += `<a href="${escapeHtml(challenge.websiteUrl)}" target="_blank" rel="noopener" class="btn btn-secondary">🌐 Open Challenge Website</a>`;
+        }
+
+        document.getElementById('detail-content').innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <div style="font-family:'Orbitron',monospace; font-size:1.35rem; font-weight:700;">${escapeHtml(challenge.title)}</div>
+            </div>
+            <div class="card-meta" style="margin-bottom:1.2rem;">
+                <span class="card-category">${escapeHtml(challenge.category)}</span>
+                <span class="card-difficulty ${challenge.difficulty}">${challenge.difficulty.toUpperCase()}</span>
+                <span class="card-points">⭐ ${challenge.points} pts</span>
+                <span class="card-solves">👥 ${challenge.solves || 0} solves</span>
+            </div>
+            <div style="color:var(--text-secondary); font-size:0.95rem; line-height:1.7; margin-bottom:1.5rem;">
+                <p>${escapeHtml(challenge.description)}</p>
+                ${challenge.author ? `<p style="color:var(--text-dim);font-size:0.82rem;margin-top:0.8rem;">Author: ${escapeHtml(challenge.author)}</p>` : ''}
+            </div>
+            <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.5rem;">${actionsHtml}</div>
+            ${hintsHtml}
+            <div style="margin-top:1.5rem;">
+                <h4>🚩 SUBMIT FLAG</h4>
+                ${!isSolved ? `
+                <div class="card-flag-form" style="margin-top:0.5rem;">
+                    <input type="text" id="detail-flag-input-${challengeId}" placeholder="Enter flag..." onkeydown="if(event.key==='Enter')submitDetailFlag('${challengeId}')">
+                    <button class="btn btn-primary btn-sm" onclick="submitDetailFlag('${challengeId}')">Submit</button>
+                </div>
+                <div class="flag-result" id="detail-flag-result-${challengeId}"></div>
+                ` : `<div class="flag-result correct" style="display:block;margin-top:0.5rem;">✅ Flag already captured!</div>`}
+            </div>
+        `;
+        document.getElementById('detail-modal').classList.add('active');
+    }
+
+    async function submitDetailFlag(challengeId) {
+        const input = document.getElementById(`detail-flag-input-${challengeId}`);
+        const result = document.getElementById(`detail-flag-result-${challengeId}`);
+        const userFlag = input.value.trim();
+        const challenges = getChallenges();
+        const challenge = challenges.find(c => c.id === challengeId);
+
+        if (!userFlag) {
+            result.className = 'flag-result incorrect';
+            result.textContent = '⚠ Please enter a flag.';
+            result.style.display = 'block';
+            return;
+        }
+
+        const userHash = await sha256(userFlag);
+        const isMatch = (challenge.flag && userFlag === challenge.flag) ||
+                        (challenge.flagHash && userHash === challenge.flagHash);
+
+        if (isMatch) {
+            result.className = 'flag-result correct';
+            result.textContent = '✅ CORRECT! Flag captured! 🎉';
+            result.style.display = 'block';
+
+            const solved = getSolved();
+            if (!solved.includes(challengeId)) {
+                solved.push(challengeId);
+                saveSolved(solved);
+                challenge.solves = (challenge.solves || 0) + 1;
+                saveChallenges(challenges);
+                addScore(challengeId, parseInt(challenge.points) || 0);
+                addLog(`Flag captured: "${challenge.title}" (+${challenge.points} pts)`, 'green');
+            }
+
+            spawnConfetti();
+            showToast(`🎉 Correct flag for "${challenge.title}"!`, 'success');
+            setTimeout(() => { closeDetailModal(); renderCurrentTab(); }, 1400);
+        } else {
+            result.className = 'flag-result incorrect';
+            result.textContent = '❌ INCORRECT FLAG. Try again!';
+            result.style.display = 'block';
+            addLog(`Wrong flag submitted for "${challenge.title}"`, 'red');
+        }
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detail-modal').classList.remove('active');
+    }
+
+    /* ─── ADMIN: MANAGE TAB ───────────────────────────────────────── */
+    function renderAdminManageTab() {
+        const challenges = getChallenges();
+        return `
+        <div class="section-header">
+            <div class="section-title"><span class="accent">⚙️</span> Challenge Management</div>
+            <div class="section-actions">
+                <button class="btn btn-sync btn-sm" onclick="switchTab('admin-github')">☁️ GitHub Sync Hub</button>
+                <button class="btn btn-secondary btn-sm" onclick="downloadChallengesJson()">💾 Download JSON</button>
+                <button class="btn btn-secondary btn-sm" onclick="copyChallengesJson()">📋 Copy JSON</button>
+            </div>
+        </div>
+
+        ${renderAdminForm()}
+
+        <div class="section-header" style="margin-top:2.5rem;">
+            <div class="section-title"><span class="accent">📋</span> Existing Challenges <span style="color:var(--text-dim);font-size:0.85rem;margin-left:0.5rem;">(${challenges.length})</span></div>
+            <div class="section-actions">
+                <button class="btn btn-danger btn-sm" onclick="confirmDeleteAll()">🗑️ Delete All</button>
+            </div>
+        </div>
+        ${renderAdminTable(challenges)}
+        `;
+    }
+
+    function renderAdminForm() {
+        const challenge = editingChallengeId ? getChallenges().find(c => c.id === editingChallengeId) : null;
+
+        const title = challenge ? challenge.title : '';
+        const desc = challenge ? challenge.description : '';
+        const cat = challenge ? challenge.category : '';
+        const diff = challenge ? challenge.difficulty : 'easy';
+        const pts = challenge ? challenge.points : '100';
+        const flag = challenge ? (challenge.flag || '') : '';
+        const fileUrl = challenge ? (challenge.fileUrl || '') : '';
+        const webUrl = challenge ? (challenge.websiteUrl || '') : '';
+        const author = challenge ? (challenge.author || '') : '';
+        const hints = challenge && challenge.hints ? challenge.hints : [];
+
+        let hintsHtml = '';
+        hints.forEach((h, i) => {
+            hintsHtml += `
+            <div class="hint-row">
+                <input type="text" class="form-input hint-input" value="${escapeHtml(h)}" placeholder="Hint ${i+1}...">
+                <button class="btn btn-danger btn-icon btn-sm" onclick="this.parentElement.remove()">✕</button>
+            </div>`;
+        });
+
+        return `
+        <div class="admin-box" id="admin-form">
+            <div class="admin-box-title">${editingChallengeId ? '✏️ EDIT CHALLENGE' : '➕ CREATE NEW CHALLENGE'}</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Challenge Title *</label>
+                    <input type="text" id="f-title" class="form-input" placeholder="e.g. Secret Agent Auth Bypass" value="${escapeHtml(title)}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <input type="text" id="f-category" class="form-input" placeholder="e.g. Web, Crypto, Forensics..." value="${escapeHtml(cat)}" list="category-list">
+                    <datalist id="category-list">
+                        <option value="Web">
+                        <option value="Crypto">
+                        <option value="Reverse Engineering">
+                        <option value="Forensics">
+                        <option value="Pwn">
+                        <option value="OSINT">
+                        <option value="Misc">
+                        <option value="Steganography">
+                    </datalist>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description & Instructions *</label>
+                <textarea id="f-description" class="form-textarea" placeholder="Explain the objective, narrative, and clues...">${escapeHtml(desc)}</textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Difficulty *</label>
+                    <select id="f-difficulty" class="form-select">
+                        <option value="easy" ${diff==='easy'?'selected':''}>🟢 Easy</option>
+                        <option value="medium" ${diff==='medium'?'selected':''}>🟠 Medium</option>
+                        <option value="hard" ${diff==='hard'?'selected':''}>🔴 Hard</option>
+                        <option value="insane" ${diff==='insane'?'selected':''}>🟣 Insane</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Points Awarded *</label>
+                    <input type="number" id="f-points" class="form-input" placeholder="100" value="${escapeHtml(pts)}" min="1">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Secret Flag *</label>
+                <input type="text" id="f-flag" class="form-input" placeholder="e.g. flag{s3cur1ty_mast3r}" value="${escapeHtml(flag)}">
+                <div class="form-hint">The platform automatically calculates a secure SHA-256 hash so visitors cannot cheat.</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Challenge File Download Link</label>
+                    <input type="text" id="f-file-url" class="form-input" placeholder="https://... or ./files/challenge.zip" value="${escapeHtml(fileUrl)}">
+                    <div class="form-hint">Optional. Link to PCAP, binary, image, or ZIP archive.</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Challenge Website / Server URL</label>
+                    <input type="text" id="f-web-url" class="form-input" placeholder="https://challenge.example.com" value="${escapeHtml(webUrl)}">
+                    <div class="form-hint">Optional. Link to vulnerable live web target.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Challenge Author</label>
+                <input type="text" id="f-author" class="form-input" placeholder="Your name / handle" value="${escapeHtml(author)}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hints</label>
+                <div id="hints-container">${hintsHtml}</div>
+                <button class="btn btn-outline btn-sm" style="margin-top:0.5rem;" onclick="addHintField()">+ Add Hint</button>
+            </div>
+
+            <div class="form-buttons">
+                ${editingChallengeId ? '<button class="btn btn-secondary" onclick="cancelEdit()">Cancel Edit</button>' : ''}
+                <button class="btn btn-primary btn-lg" onclick="saveChallengeForm()">
+                    ${editingChallengeId ? '💾 UPDATE CHALLENGE' : '➕ CREATE CHALLENGE'}
+                </button>
+            </div>
+        </div>`;
+    }
+
+    function addHintField() {
+        const c = document.getElementById('hints-container');
+        const div = document.createElement('div');
+        div.className = 'hint-row';
+        div.innerHTML = `
+            <input type="text" class="form-input hint-input" placeholder="Enter a helpful hint...">
+            <button class="btn btn-danger btn-icon btn-sm" onclick="this.parentElement.remove()">✕</button>
+        `;
+        c.appendChild(div);
+    }
+
+    async function saveChallengeForm() {
+        const title = document.getElementById('f-title').value.trim();
+        const category = document.getElementById('f-category').value.trim();
+        const description = document.getElementById('f-description').value.trim();
+        const difficulty = document.getElementById('f-difficulty').value;
+        const points = document.getElementById('f-points').value.trim();
+        const flag = document.getElementById('f-flag').value.trim();
+        const fileUrl = document.getElementById('f-file-url').value.trim();
+        const websiteUrl = document.getElementById('f-web-url').value.trim();
+        const author = document.getElementById('f-author').value.trim();
+
+        const hintInputs = document.querySelectorAll('.hint-input');
+        const hints = Array.from(hintInputs).map(i => i.value.trim()).filter(Boolean);
+
+        if (!title || !category || !description || !points || !flag) {
+            showToast('Please fill in all required fields (*)', 'error');
+            return;
+        }
+
+        const flagHash = await sha256(flag);
+        const challenges = getChallenges();
+
+        if (editingChallengeId) {
+            const idx = challenges.findIndex(c => c.id === editingChallengeId);
+            if (idx !== -1) {
+                challenges[idx] = {
+                    ...challenges[idx],
+                    title, category, description, difficulty,
+                    points: parseInt(points), flag, flagHash,
+                    fileUrl, websiteUrl, author, hints,
+                    updatedAt: new Date().toISOString()
+                };
+                addLog(`Updated challenge "${title}"`, 'blue');
+                showToast(`Challenge "${title}" updated!`, 'success');
+            }
+            editingChallengeId = null;
+        } else {
+            const newChal = {
+                id: generateId(),
+                title, category, description, difficulty,
+                points: parseInt(points), flag, flagHash,
+                fileUrl, websiteUrl, author, hints,
+                solves: 0,
+                createdAt: new Date().toISOString()
+            };
+            challenges.push(newChal);
+            addLog(`Created challenge "${title}" (${points} pts)`, 'green');
+            showToast(`Challenge "${title}" created!`, 'success');
+        }
+
+        saveChallenges(challenges);
+        renderCurrentTab();
+
+        // Check if auto-sync to GitHub is enabled
+        const ghConfig = getGitHubConfig();
+        if (ghConfig.autoSync && ghConfig.token && ghConfig.repo) {
+            publishToGitHubAPI(true);
+        }
+    }
+
+    function editChallenge(id) {
+        editingChallengeId = id;
+        renderCurrentTab();
+        const f = document.getElementById('admin-form');
+        if (f) f.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        editingChallengeId = null;
+        renderCurrentTab();
+    }
+
+    function confirmDeleteChallenge(id) {
+        const challenge = getChallenges().find(c => c.id === id);
+        if (!challenge) return;
+        document.getElementById('confirm-msg').textContent = `Delete "${challenge.title}"?`;
+        confirmCallback = () => {
+            let challenges = getChallenges();
+            challenges = challenges.filter(c => c.id !== id);
+            saveChallenges(challenges);
+            addLog(`Deleted challenge "${challenge.title}"`, 'red');
+            showToast(`Deleted "${challenge.title}".`, 'info');
+            renderCurrentTab();
+
+            const ghConfig = getGitHubConfig();
+            if (ghConfig.autoSync && ghConfig.token && ghConfig.repo) {
+                publishToGitHubAPI(true);
+            }
+        };
+        document.getElementById('confirm-dialog').classList.add('active');
+    }
+
+    function confirmDeleteAll() {
+        document.getElementById('confirm-msg').textContent = 'Delete ALL challenges? This cannot be reversed!';
+        confirmCallback = () => {
+            saveChallenges([]);
+            addLog('Deleted all challenges', 'red');
+            showToast('All challenges cleared.', 'info');
+            renderCurrentTab();
+        };
+        document.getElementById('confirm-dialog').classList.add('active');
+    }
+
+    function confirmAction() {
+        if (confirmCallback) confirmCallback();
+        closeConfirm();
+    }
+
+    function closeConfirm() {
+        document.getElementById('confirm-dialog').classList.remove('active');
+        confirmCallback = null;
+    }
+
+    function renderAdminTable(challenges) {
+        if (challenges.length === 0) {
+            return `
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <div class="empty-state-title">No Challenges Registered</div>
+                <div class="empty-state-desc">Use the form above to add your first challenge.</div>
+            </div>`;
+        }
+
+        const rows = challenges.map(c => `
+            <tr>
+                <td style="font-weight:600;">${escapeHtml(c.title)}</td>
+                <td><span class="card-category">${escapeHtml(c.category)}</span></td>
+                <td><span class="card-difficulty ${c.difficulty}">${c.difficulty.toUpperCase()}</span></td>
+                <td style="font-family:'Orbitron',monospace;font-weight:700;color:var(--neon-yellow);">${c.points}</td>
+                <td class="flag-cell" title="${escapeHtml(c.flag || c.flagHash)}">${escapeHtml(c.flag || '(Hash: ' + c.flagHash.slice(0, 10) + '...)')}</td>
+                <td>${c.solves || 0}</td>
+                <td>
+                    <div style="display:flex; gap:0.4rem;">
+                        <button class="btn btn-secondary btn-sm btn-icon" title="Edit" onclick="editChallenge('${c.id}')">✏️</button>
+                        <button class="btn btn-danger btn-sm btn-icon" title="Delete" onclick="confirmDeleteChallenge('${c.id}')">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        return `
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Difficulty</th>
+                        <th>Points</th>
+                        <th>Secret Flag</th>
+                        <th>Solves</th>
+                        <th style="width:90px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+    }
+
+    /* ─── ADMIN: GITHUB SYNC HUB (PUBLISH WORLDWIDE) ──────────────── */
+    function renderAdminGitHubTab() {
+        const gh = getGitHubConfig();
+        const count = getChallenges().length;
+
+        return `
+        <div class="section-header">
+            <div class="section-title"><span class="accent">☁️</span> GitHub Worldwide Sync Hub</div>
+            <div class="section-actions">
+                <button class="btn btn-secondary btn-sm" onclick="downloadChallengesJson()">💾 Download challenges.json</button>
+                <button class="btn btn-secondary btn-sm" onclick="copyChallengesJson()">📋 Copy JSON</button>
+            </div>
+        </div>
+
+        <div class="sync-card">
+            <div class="admin-box-title" style="color:var(--neon-blue);">🚀 1-CLICK PUBLISH DIRECTLY TO GITHUB</div>
+            <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">
+                When you publish to GitHub, your challenges file (<code>challenges.json</code>) is committed straight into your GitHub repository branch. 
+                Because your site is hosted on GitHub Pages, <strong>anyone across the world who visits your site will instantly see your new challenges!</strong>
+            </p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">GitHub Repository (owner/repo) *</label>
+                    <input type="text" id="gh-repo" class="form-input" placeholder="e.g. YourUsername/CTF" value="${escapeHtml(gh.repo)}">
+                    <div class="form-hint">Format: username/repository (e.g. <code>octocat/my-ctf</code>)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Branch *</label>
+                    <input type="text" id="gh-branch" class="form-input" placeholder="main" value="${escapeHtml(gh.branch || 'main')}">
+                    <div class="form-hint">Usually <code>main</code> or <code>gh-pages</code></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">GitHub Personal Access Token (PAT) *</label>
+                <input type="password" id="gh-token" class="form-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx or github_pat_xxxx" value="${escapeHtml(gh.token)}">
+                <div class="form-hint">Saved securely in your browser's private local storage only. Needs "Contents: Read and Write" or "repo" permission.</div>
+            </div>
+
+            <div class="form-group" style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-top:1rem;">
+                <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.88rem;">
+                    <input type="checkbox" id="gh-autosync" ${gh.autoSync ? 'checked' : ''}>
+                    <span>Auto-publish to GitHub whenever I add or edit a challenge</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; font-size:0.88rem;">
+                    <input type="checkbox" id="gh-stripflags" ${gh.stripPlainFlags ? 'checked' : ''}>
+                    <span>Hide plaintext flags in public file (Recommended: Uses SHA-256 hashes to prevent cheating)</span>
+                </label>
+            </div>
+
+            <div class="form-buttons" style="margin-top:2rem;">
+                <button class="btn btn-secondary" onclick="saveGitHubSettingsOnly()">💾 Save Settings</button>
+                <button class="btn btn-sync btn-lg" id="publish-btn" onclick="publishToGitHubAPI()">
+                    🚀 PUBLISH ${count} CHALLENGES TO GITHUB NOW
+                </button>
+            </div>
+        </div>
+
+        <div class="sync-card">
+            <div class="admin-box-title" style="color:var(--neon-green);">📖 2 ALTERNATIVE WAYS TO UPDATE GITHUB</div>
+            <div class="sync-steps">
+                <div class="step-box">
+                    <div class="step-num">METHOD 1: AUTOMATIC API (ABOVE)</div>
+                    <div class="step-text">
+                        Fill in your repo and GitHub token above and click <strong>Publish to GitHub</strong>. The webpage communicates with GitHub REST API and updates <code>challenges.json</code> automatically!
+                    </div>
+                </div>
+                <div class="step-box">
+                    <div class="step-num">METHOD 2: DOWNLOAD & DRAG-AND-DROP</div>
+                    <div class="step-text">
+                        Click <strong>"💾 Download challenges.json"</strong> above. Save it in your local CTF folder, or drag-and-drop it directly into your repository page on GitHub.com and commit.
+                    </div>
+                </div>
+                <div class="step-box">
+                    <div class="step-num">METHOD 3: GIT PUSH FROM TERMINAL</div>
+                    <div class="step-text">
+                        Download the file into your local git repository, then run:
+                        <code style="display:block;margin-top:0.4rem;color:var(--neon-green);">git add challenges.json<br>git commit -m "Update CTF"<br>git push</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    function saveGitHubSettingsOnly() {
+        const repo = document.getElementById('gh-repo').value.trim();
+        const branch = document.getElementById('gh-branch').value.trim() || 'main';
+        const token = document.getElementById('gh-token').value.trim();
+        const autoSync = document.getElementById('gh-autosync').checked;
+        const stripPlainFlags = document.getElementById('gh-stripflags').checked;
+
+        saveGitHubConfig({ repo, branch, token, autoSync, stripPlainFlags });
+        showToast('GitHub configuration saved locally.', 'success');
+    }
+
+    /* ─── GITHUB REST API DIRECT SYNC ────────────────────────────── */
+    async function publishToGitHubAPI(silent = false) {
+        const repoInput = document.getElementById('gh-repo');
+        const branchInput = document.getElementById('gh-branch');
+        const tokenInput = document.getElementById('gh-token');
+        const autoSyncInput = document.getElementById('gh-autosync');
+        const stripInput = document.getElementById('gh-stripflags');
+
+        let repo = repoInput ? repoInput.value.trim() : getGitHubConfig().repo;
+        let branch = branchInput ? (branchInput.value.trim() || 'main') : (getGitHubConfig().branch || 'main');
+        let token = tokenInput ? tokenInput.value.trim() : getGitHubConfig().token;
+        let stripPlainFlags = stripInput ? stripInput.checked : getGitHubConfig().stripPlainFlags;
+
+        if (repoInput) {
+            saveGitHubConfig({
+                repo,
+                branch,
+                token,
+                autoSync: autoSyncInput ? autoSyncInput.checked : false,
+                stripPlainFlags
+            });
+        }
+
+        if (!repo || !token) {
+            if (!silent) {
+                showToast('Please enter your GitHub Repository (owner/repo) and Token first!', 'error');
+                switchTab('admin-github');
+            }
+            return;
+        }
+
+        const publishBtn = document.getElementById('publish-btn');
+        if (publishBtn) {
+            publishBtn.disabled = true;
+            publishBtn.textContent = '⏳ COMMITTING TO GITHUB...';
+        }
+
+        try {
+            // Clean/prepare data to commit
+            const challenges = getChallenges();
+            const exportData = challenges.map(c => {
+                const copy = { ...c };
+                if (stripPlainFlags) {
+                    delete copy.flag; // keep only flagHash for cheating prevention
+                }
+                return copy;
+            });
+
+            const jsonStr = JSON.stringify(exportData, null, 2);
+            // UTF-8 safe Base64 encoder
+            const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
+
+            const apiBase = `https://api.github.com/repos/${repo}/contents/challenges.json`;
+
+            // Step 1: Check existing file SHA
+            let existingSha = null;
+            try {
+                const getRes = await fetch(`${apiBase}?ref=${branch}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json'
+                    }
+                });
+                if (getRes.ok) {
+                    const fileData = await getRes.json();
+                    existingSha = fileData.sha;
+                }
+            } catch (err) {
+                // File does not exist yet; will create new
+            }
+
+            // Step 2: PUT request to commit/update
+            const putBody = {
+                message: `Update CTF challenges (${challenges.length} challenges) via CyberFlags Admin`,
+                content: encodedContent,
+                branch: branch
+            };
+            if (existingSha) {
+                putBody.sha = existingSha;
+            }
+
+            const putRes = await fetch(apiBase, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(putBody)
+            });
+
+            if (!putRes.ok) {
+                const errData = await putRes.json();
+                throw new Error(errData.message || 'GitHub API error ' + putRes.status);
+            }
+
+            addLog(`Published ${challenges.length} challenges live to GitHub (${repo})`, 'green');
+            spawnConfetti();
+            showToast('🎉 Successfully published to GitHub! Visible globally.', 'success');
+            isDataSourceRemote = true;
+            updateSyncBadge(true);
+        } catch (err) {
+            console.error('GitHub Sync failed:', err);
+            showToast('GitHub Sync Failed: ' + err.message, 'error');
+        } finally {
+            if (publishBtn) {
+                publishBtn.disabled = false;
+                publishBtn.textContent = '🚀 PUBLISH CHALLENGES TO GITHUB NOW';
+            }
+        }
+    }
+
+    /* ─── DOWNLOAD / COPY JSON ───────────────────────────────────── */
+    function downloadChallengesJson() {
+        const data = getChallenges();
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'challenges.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        addLog('Downloaded challenges.json file', 'blue');
+        showToast('Downloaded challenges.json! Place it in your GitHub repository.', 'success');
+    }
+
+    function copyChallengesJson() {
+        const data = getChallenges();
+        const jsonStr = JSON.stringify(data, null, 2);
+        navigator.clipboard.writeText(jsonStr).then(() => {
+            showToast('Copied challenges.json to clipboard!', 'info');
+        }).catch(() => {
+            showToast('Clipboard access denied.', 'error');
+        });
+    }
+
+    /* ─── SCOREBOARD TAB ─────────────────────────────────────────── */
+    function renderScoreboardTab() {
+        const scores = getScores();
+        const entries = Object.values(scores).sort((a, b) => b.total - a.total);
+
+        if (entries.length === 0) {
+            return `
+            <div class="section-header">
+                <div class="section-title"><span class="accent">🏆</span> Arena Scoreboard</div>
+            </div>
+            <div class="empty-state">
+                <div class="empty-state-icon">🏆</div>
+                <div class="empty-state-title">No Flags Solved Yet</div>
+                <div class="empty-state-desc">Solve your first challenge and your score will be logged here!</div>
+            </div>`;
+        }
+
+        const rows = entries.map((e, i) => {
+            let rankBadge = `#${i+1}`;
+            let rankClass = '';
+            if (i === 0) { rankBadge = '🥇'; rankClass = 'gold'; }
+            else if (i === 1) { rankBadge = '🥈'; rankClass = 'silver'; }
+            else if (i === 2) { rankBadge = '🥉'; rankClass = 'bronze'; }
+
+            return `<tr>
+                <td><span class="rank-badge ${rankClass}">${rankBadge}</span></td>
+                <td style="font-weight:600;">${escapeHtml(e.name)}</td>
+                <td style="font-family:'Orbitron',monospace;font-weight:800;color:var(--neon-yellow);">${e.total}</td>
+                <td>${e.solved.length}</td>
+            </tr>`;
+        }).join('');
+
+        return `
+        <div class="section-header">
+            <div class="section-title"><span class="accent">🏆</span> Arena Scoreboard</div>
+        </div>
+        <div class="leaderboard-table-wrap">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th style="width:70px;">Rank</th>
+                        <th>Challenger</th>
+                        <th style="width:110px;">Score</th>
+                        <th style="width:110px;">Solves</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+    }
+
+    /* ─── ABOUT & RULES TAB ──────────────────────────────────────── */
+    function renderAboutTab() {
+        return `
+        <div style="max-width: 860px; margin: 0 auto;">
+            <div class="admin-box" style="margin-bottom:1.5rem;">
+                <div class="admin-box-title">🚩 ABOUT CYBERFLAGS</div>
+                <p style="color:var(--text-secondary); line-height:1.8;">
+                    CYBERFLAGS is a distributed Capture The Flag (CTF) arena designed to host cybersecurity challenges on 
+                    <strong>GitHub Pages</strong>. It allows anyone around the globe to explore challenges, inspect hints, download archives, 
+                    attack web targets, and submit verified flags.
+                </p>
+            </div>
+
+            <div class="admin-box" style="margin-bottom:1.5rem;">
+                <div class="admin-box-title" style="color:var(--neon-blue);">📋 RULES OF THE ARENA</div>
+                <ul style="list-style:none; padding:0; color:var(--text-secondary); line-height:1.9;">
+                    <li><strong style="color:var(--neon-green);">1.</strong> Attack only the target challenge files and URLs. Do not DDoS the host site.</li>
+                    <li><strong style="color:var(--neon-green);">2.</strong> Flags are case-sensitive. Submit them with the exact prefix (e.g. <code>flag{...}</code>).</li>
+                    <li><strong style="color:var(--neon-green);">3.</strong> Automated brute-force attacks against the submission box are prohibited.</li>
+                    <li><strong style="color:var(--neon-green);">4.</strong> All flag submissions are checked locally in your browser using high-speed cryptographic SHA-256 verification.</li>
+                    <li><strong style="color:var(--neon-green);">5.</strong> Learn, hack ethically, and enjoy the competition!</li>
+                </ul>
+            </div>
+
+            <div class="admin-box">
+                <div class="admin-box-title" style="color:var(--neon-purple);">🌐 HOW WORLDWIDE GITHUB HOSTING WORKS</div>
+                <p style="color:var(--text-secondary); line-height:1.8;">
+                    All challenges reside in the <code>challenges.json</code> database file inside your GitHub repository. 
+                    When the administrator updates or adds challenges using the <strong>GitHub Sync Hub</strong>, the new challenges 
+                    are pushed directly to GitHub. 
+                    Every person opening your GitHub Pages URL automatically fetches the latest challenges worldwide!
+                </p>
+            </div>
+        </div>`;
+    }
+
+    /* ─── ADMIN: ACTIVITY TAB ────────────────────────────────────── */
+    function renderAdminActivityTab() {
+        const log = getLog();
+        if (log.length === 0) {
+            return `
+            <div class="section-header">
+                <div class="section-title"><span class="accent">📋</span> Activity Log</div>
+            </div>
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-title">No Activity Recorded</div>
+                <div class="empty-state-desc">Actions will be logged here as users solve challenges and admins make updates.</div>
+            </div>`;
+        }
+
+        const items = log.map(l => {
+            const d = new Date(l.time);
+            return `
+            <div class="activity-item">
+                <div class="activity-dot ${l.type}"></div>
+                <div class="activity-text">${escapeHtml(l.text)}</div>
+                <div class="activity-time">${d.toLocaleTimeString()} ${d.toLocaleDateString()}</div>
+            </div>`;
+        }).join('');
+
+        return `
+        <div class="section-header">
+            <div class="section-title"><span class="accent">📋</span> Activity Log</div>
+            <div class="section-actions">
+                <button class="btn btn-secondary btn-sm" onclick="clearActivityLog()">🧹 Clear Log</button>
+            </div>
+        </div>
+        <div class="activity-feed">${items}</div>`;
+    }
+
+    function clearActivityLog() {
+        localStorage.removeItem(LOG_KEY);
+        showToast('Activity log cleared.', 'info');
+        renderCurrentTab();
+    }
+
+    /* ─── TOAST & CONFETTI HELPERS ────────────────────────────────── */
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+        toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4200);
+    }
+
+    function spawnConfetti() {
+        const container = document.getElementById('confetti-container');
+        const colors = ['#00ff88', '#00d4ff', '#b44dff', '#ff3366', '#ffdd00', '#ff8800'];
+        for (let i = 0; i < 70; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + '%';
+            c.style.top = '-10px';
+            c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDelay = Math.random() * 0.4 + 's';
+            c.style.animationDuration = (1.2 + Math.random()) + 's';
+            c.style.width = (5 + Math.random() * 7) + 'px';
+            c.style.height = (5 + Math.random() * 7) + 'px';
+            container.appendChild(c);
+        }
+        setTimeout(() => container.innerHTML = '', 3000);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    /* ─── KEYBOARD SHORTCUTS ──────────────────────────────────────── */
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAdminLogin();
+            closeDetailModal();
+            closeConfirm();
+        }
+    });
+
+    /* ─── SEED INITIAL DEMO DATA (FALLBACK) ───────────────────────── */
+    function seedInitialDemo() {
+        const demo = [
+            {
+                id: 'demo01',
+                title: 'Hello, Flag!',
+                category: 'Misc',
+                description: 'Welcome to CYBERFLAGS! This is your very first challenge. The flag is hidden in plain sight. Sometimes the answer is simpler than you think. Just read carefully and try the most obvious answer.',
+                difficulty: 'easy',
+                points: 50,
+                flag: 'flag{w3lc0m3_t0_cyb3rfl4gs}',
+                flagHash: '7e1f8d5685fa74fb48ec7bcd36477789663f493a7d0b9227646ceff5c9a773b4',
+                fileUrl: '',
+                websiteUrl: '',
+                author: 'CyberFlags Team',
+                hints: ['The flag format is flag{...}', 'Read the challenge description very carefully!'],
+                solves: 0,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'demo02',
+                title: 'Base64 Basics',
+                category: 'Crypto',
+                description: 'We intercepted this encoded message from a suspicious source. Can you decode it? The encoded string is: ZmxhZ3tiYXM2NF9pc19ub3RfZW5jcnlwdGlvbn0=',
+                difficulty: 'easy',
+                points: 75,
+                flag: 'flag{bas64_is_not_encryption}',
+                flagHash: '451db8086a3ab7f76a0fc644c48df6d94b9c4d8906cfe917859c812a7d75e08a',
+                fileUrl: '',
+                websiteUrl: '',
+                author: 'CryptoMaster',
+                hints: ['This is Base64 encoding', 'Use a Base64 decoder — there are many online tools'],
+                solves: 0,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'demo03',
+                title: 'Inspect Element',
+                category: 'Web',
+                description: 'A secret message is hidden somewhere in the challenge webpage. Can you find the hidden flag? Open the challenge site and use your browser developer tools to dig around. Not everything is visible on the surface...',
+                difficulty: 'easy',
+                points: 100,
+                flag: 'flag{d3v_t00ls_ar3_y0ur_fri3nd}',
+                flagHash: '8e512dbd7901a3e17d31403c535272ff38b4fad29d981566d2356599200e005c',
+                fileUrl: '',
+                websiteUrl: '',
+                author: 'WebHacker',
+                hints: ['Right-click → Inspect Element', 'Check HTML comments and hidden elements'],
+                solves: 0,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'demo04',
+                title: 'Caesar\'s Secret',
+                category: 'Crypto',
+                description: 'Julius Caesar used a simple cipher to communicate with his generals. We found this encoded message: "iodj{fdhvdu_flskhu_lv_hdvb}". Can you crack the code and recover the original flag?',
+                difficulty: 'medium',
+                points: 150,
+                flag: 'flag{caesar_cipher_is_easy}',
+                flagHash: '8278265d96c6871ab22646171b3bfaed0aa8d6738f18cc33ba90da44d1691447',
+                fileUrl: '',
+                websiteUrl: '',
+                author: 'CryptoMaster',
+                hints: ['This is a Caesar cipher with a shift of 3', 'Each letter is shifted forward by 3 positions in the alphabet'],
+                solves: 0,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'demo05',
+                title: 'Binary Brain Teaser',
+                category: 'Misc',
+                description: 'Convert the following binary string to ASCII text to reveal the flag: 01100110 01101100 01100001 01101111 01111011 01100010 00110001 01101110 01100001 01110010 01111001 01011111 01101101 01100001 01110011 01110100 00110011 01110010 01111101',
+                difficulty: 'easy',
+                points: 75,
+                flag: 'flag{b1nary_mast3r}',
+                flagHash: '75fd327dd1f57394977d02bc710bc9cdd62adefdbd116582c5461b5dfb219e98',
+                fileUrl: '',
+                websiteUrl: '',
+                author: 'BinWiz',
+                hints: ['Each 8-digit group is one ASCII character', 'Search for a binary to ASCII converter'],
+                solves: 0,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 'demo06',
+                title: 'Packet Sniffer',
+                category: 'Forensics',
+                description: 'We captured some suspicious network traffic. Hidden within the packet capture file is a secret flag. Download the PCAP file and analyze it with Wireshark or a similar tool. Look for unusual HTTP requests or hidden data in the TCP streams.',
+                difficulty: 'hard',
+                points: 300,
+                flag: 'flag{pcap_4n4lys1s_pr0}',
+                flagHash: 'c780f8b426cc0465fcb46210fabdad81904be2c41e579b6b6fa31f88856e01f7',
+                fileUrl: '',
+                websiteUrl: '',
+                author: 'NetDetective',
+                hints: ['Use Wireshark to open the file', 'Follow the TCP streams', 'Look at HTTP request headers'],
+                solves: 0,
+                createdAt: new Date().toISOString()
+            }
+        ];
+        saveChallenges(demo);
+    }
+
+    /* ─── INITIALIZATION ON LOAD ──────────────────────────────────── */
+    window.addEventListener('DOMContentLoaded', async () => {
+        // Load data globally from challenges.json
+        await loadGlobalChallenges();
+
+        // Check if user has an active session from refresh
+        const savedRole = sessionStorage.getItem('cyberflags_role');
+        if (savedRole === 'admin' || savedRole === 'anon') {
+            currentRole = savedRole;
+            enterApp();
+        } else {
+            showScreen('intro-screen');
+        }
+    });
+    </script>
+</body>
+</html>
