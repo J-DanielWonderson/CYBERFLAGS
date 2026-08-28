@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Gateway [CTF]</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin-top: 15%;
+        }
+        .container {
+            border: 1px solid #30363d;
+            padding: 40px;
+            display: inline-block;
+            border-radius: 10px;
+            background-color: #161b22;
+        }
+        /* Hidden from normal view via CSS */
+        .invisible-ink {
+            opacity: 0;
+            user-select: none;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CLUE 2: The PIN is hidden as a custom data attribute in this container -->
+    <div class="container" id="main_system" data-override-pin="54">
+        <h1>🔒 QUANTUM GATEWAY LOCKED</h1>
+        <p>Status: Awaiting Initialization Sequence...</p>
+        
+        <!-- CLUE 1: The first half of the flag -->
+        <p class="invisible-ink">Part 1: FLAG{w3b_1nsp3ct10n_</p>
+    </div>
+
+    <script>
+        // CLUE 3: The JavaScript Logic
+        // Dev Note: System fails without the 'auth_pin' in LocalStorage.
+        // The correct PIN is stored in the data attribute of the main system container.
+        
+        console.log("System initialized. Awaiting correct auth_pin in LocalStorage.");
+        console.log("Once set, run retrieveSecondHalf() to unlock the core.");
+
+        function retrieveSecondHalf() {
+            let pin = localStorage.getItem('auth_pin');
+            
+            if (!pin) {
+                return "ERROR: 'auth_pin' not found in LocalStorage.";
+            }
+            
+            // The secure vault contains shifted character codes.
+            // Reading the source code won't give you the text without the PIN!
+            const secureVault = [164, 103, 164, 160, 106, 149, 104, 102, 104, 108, 179];
+            let decrypted = "";
+            
+            // Decrypt the array using the PIN
+            for(let i = 0; i < secureVault.length; i++) {
+                decrypted += String.fromCharCode(secureVault[i] - parseInt(pin));
+            }
+            
+            return "Part 2 Output: " + decrypted;
+        }
+    </script>
+</body>
+</html>
