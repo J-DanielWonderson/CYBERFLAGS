@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚑ CYBERFLAGS — Capture The Flag Arena</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚩</text></svg>">
+    <!-- Firebase SDK (v10 compat for GitHub Pages & browser) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <style>
         /* ═══════════════════════════════════════════════════════════════════
            FONTS
@@ -286,12 +289,12 @@
             left: 100%;
         }
 
-        .intro-btn.admin-btn:hover {
-            border-color: var(--neon-red);
-            box-shadow: var(--shadow-md), 0 0 30px rgba(255, 51, 102, 0.25);
+        .intro-btn.signin-btn:hover {
+            border-color: var(--neon-blue);
+            box-shadow: var(--shadow-md), var(--shadow-neon-blue);
             transform: translateY(-4px);
         }
-        .intro-btn.anon-btn:hover {
+        .intro-btn.signup-btn:hover {
             border-color: var(--neon-green);
             box-shadow: var(--shadow-md), var(--shadow-neon-green);
             transform: translateY(-4px);
@@ -309,8 +312,8 @@
             color: var(--text-muted);
             max-width: 220px;
         }
-        .admin-btn .intro-btn-label { color: var(--neon-red); }
-        .anon-btn .intro-btn-label { color: var(--neon-green); }
+        .signin-btn .intro-btn-label { color: var(--neon-blue); }
+        .signup-btn .intro-btn-label { color: var(--neon-green); }
 
         .intro-footer {
             margin-top: 3.5rem;
@@ -321,7 +324,7 @@
         .intro-footer .version { color: var(--neon-green-dim); }
 
         /* ═══════════════════════════════════════════════════════════════════
-           ADMIN LOGIN MODAL
+           MODAL SYSTEM & AUTH MODAL (FIREBASE)
            ═══════════════════════════════════════════════════════════════════ */
         .modal-overlay {
             display: none;
@@ -347,8 +350,8 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 2.8rem;
-            max-width: 450px;
+            padding: 2.5rem;
+            max-width: 460px;
             width: 100%;
             position: relative;
             box-shadow: var(--shadow-lg);
@@ -373,32 +376,128 @@
         }
         .modal-close:hover { color: var(--neon-red); }
 
-        .modal-title {
+        /* Auth Tabs */
+        .auth-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.6rem;
+            gap: 0.5rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
             font-family: 'Orbitron', monospace;
-            font-size: 1.35rem;
+            font-size: 0.82rem;
             font-weight: 700;
-            color: var(--neon-red);
-            margin-bottom: 0.4rem;
+            cursor: pointer;
+            text-align: center;
+            letter-spacing: 0.08em;
+            transition: all var(--transition-fast);
+            margin-bottom: -2px;
+        }
+
+        .auth-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .auth-tab.active {
+            color: var(--neon-green);
+            border-bottom-color: var(--neon-green);
+        }
+
+        .auth-tab.active.signin-active {
+            color: var(--neon-blue);
+            border-bottom-color: var(--neon-blue);
+        }
+
+        /* Google Auth Button */
+        .btn-google {
+            width: 100%;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            justify-content: center;
+            gap: 0.85rem;
+            padding: 0.85rem 1.2rem;
+            background: #121226;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.98rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            margin-bottom: 1.2rem;
         }
 
-        .modal-desc {
+        .btn-google:hover {
+            background: #1a1a38;
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-google svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-dim);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            margin: 1.4rem 0;
+            letter-spacing: 0.1em;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .auth-divider span {
+            padding: 0 0.8rem;
+        }
+
+        .auth-switch-link {
+            text-align: center;
+            margin-top: 1.3rem;
+            font-size: 0.84rem;
             color: var(--text-secondary);
-            font-size: 0.88rem;
-            margin-bottom: 1.8rem;
         }
 
-        .form-group { margin-bottom: 1.4rem; }
+        .auth-switch-link a {
+            color: var(--neon-blue);
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .auth-switch-link a:hover {
+            color: var(--neon-green);
+        }
+
+        .form-group { margin-bottom: 1.2rem; }
         .form-label {
             display: block;
             font-family: 'Orbitron', monospace;
-            font-size: 0.74rem;
+            font-size: 0.72rem;
             font-weight: 600;
             letter-spacing: 0.1em;
             color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.45rem;
             text-transform: uppercase;
         }
         .form-input {
@@ -409,7 +508,7 @@
             border-radius: var(--radius-sm);
             color: var(--text-primary);
             font-family: 'Fira Code', monospace;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             outline: none;
             transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
@@ -433,12 +532,15 @@
         .form-error {
             color: var(--neon-red);
             font-size: 0.78rem;
-            margin-top: 0.35rem;
+            margin-top: 0.4rem;
+            margin-bottom: 0.6rem;
             font-family: 'Share Tech Mono', monospace;
             display: none;
-        }
-        .form-error.visible {
-            display: block;
+            line-height: 1.4;
+            background: rgba(255, 51, 102, 0.08);
+            border: 1px solid rgba(255, 51, 102, 0.2);
+            padding: 0.5rem 0.8rem;
+            border-radius: var(--radius-sm);
         }
 
         /* ═══════════════════════════════════════════════════════════════════
@@ -641,16 +743,58 @@
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.72rem;
             letter-spacing: 0.05em;
+            white-space: nowrap;
         }
         .nav-role-badge.admin {
-            background: rgba(255, 51, 102, 0.1);
-            border: 1px solid rgba(255, 51, 102, 0.3);
+            background: rgba(255, 51, 102, 0.15);
+            border: 1px solid rgba(255, 51, 102, 0.4);
             color: var(--neon-red);
+            font-weight: 700;
         }
-        .nav-role-badge.anon {
+        .nav-role-badge.challenger {
             background: rgba(0, 255, 136, 0.1);
             border: 1px solid rgba(0, 255, 136, 0.3);
             color: var(--neon-green);
+        }
+
+        .nav-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .nav-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--neon-blue);
+            object-fit: cover;
+            display: block;
+        }
+
+        .nav-avatar-placeholder {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .nav-user-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .nav-logout {
@@ -1401,31 +1545,10 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════════
-           RESPONSIVE
+           RESPONSIVE & MOBILE NAV
            ═══════════════════════════════════════════════════════════════════ */
-        @media (max-width: 768px) {
-            .navbar { padding: 0 1rem; height: 56px; }
-            .nav-center { display: none; }
-            .mobile-menu-btn { display: block !important; }
-            .mobile-nav {
-                display: none;
-                position: fixed;
-                top: 56px;
-                left: 0;
-                right: 0;
-                background: var(--bg-secondary);
-                border-bottom: 1px solid var(--border-color);
-                padding: 1rem;
-                z-index: 99;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .mobile-nav.open { display: flex; }
-            .mobile-nav .nav-tab { width: 100%; text-align: center; padding: 0.7rem; }
-            .main-content { padding: 1rem; }
-            .challenges-grid { grid-template-columns: 1fr; }
-            .stats-bar { grid-template-columns: 1fr 1fr; }
-            .form-row { grid-template-columns: 1fr; }
+        .mobile-nav {
+            display: none !important;
         }
 
         .mobile-menu-btn {
@@ -1438,6 +1561,31 @@
             border-radius: var(--radius-sm);
             cursor: pointer;
             font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0 1rem; height: 56px; }
+            .nav-center { display: none; }
+            .mobile-menu-btn { display: block !important; }
+            .mobile-nav {
+                display: none !important;
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                background: var(--bg-secondary);
+                border-bottom: 1px solid var(--border-color);
+                padding: 1rem;
+                z-index: 99;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .mobile-nav.open { display: flex !important; }
+            .mobile-nav .nav-tab { width: 100%; text-align: center; padding: 0.7rem; }
+            .main-content { padding: 1rem; }
+            .challenges-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+            .form-row { grid-template-columns: 1fr; }
         }
 
         .empty-state {
@@ -1483,49 +1631,99 @@
         <p class="intro-prompt">IDENTIFY YOUR ACCESS LEVEL</p>
 
         <div class="intro-buttons">
-            <button class="intro-btn admin-btn" onclick="showAdminLogin()">
-                <span class="intro-btn-icon">🔐</span>
-                <span class="intro-btn-label">I AM THE ADMIN</span>
-                <span class="intro-btn-desc">Create challenges, edit flags, and publish live to GitHub</span>
+            <button class="intro-btn signin-btn" onclick="openAuthModal('signin')">
+                <span class="intro-btn-icon">🔑</span>
+                <span class="intro-btn-label">SIGN IN</span>
+                <span class="intro-btn-desc">Log in with Google or Email to resume hacking</span>
             </button>
-            <button class="intro-btn anon-btn" onclick="enterAsAnonymous()">
-                <span class="intro-btn-icon">👤</span>
-                <span class="intro-btn-label">I AM ANONYMOUS</span>
-                <span class="intro-btn-desc">Browse challenges, download files, capture flags worldwide</span>
+            <button class="intro-btn signup-btn" onclick="openAuthModal('signup')">
+                <span class="intro-btn-icon">⚡</span>
+                <span class="intro-btn-label">SIGN UP</span>
+                <span class="intro-btn-desc">Create your hacker identity and enter the arena</span>
             </button>
         </div>
 
         <div class="intro-footer">
-            <span>CYBERFLAGS ARENA</span> · <span class="version">v3.5.0</span> · <span>GITHUB HOSTED READY</span>
+            <span>CYBERFLAGS ARENA</span> · <span class="version">v4.0.0</span> · <span>SECURED BY FIREBASE AUTH</span>
         </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════
-         ADMIN LOGIN MODAL
+         FIREBASE AUTH MODAL (SIGN IN & SIGN UP)
          ═══════════════════════════════════════════════════════════════════ -->
-    <div id="admin-login-modal" class="modal-overlay">
+    <div id="auth-modal" class="modal-overlay auth-modal">
         <div class="modal-box">
-            <button class="modal-close" onclick="closeAdminLogin()">&times;</button>
-            <div class="modal-title">🔐 ADMIN ACCESS</div>
-            <p class="modal-desc">Enter your credentials to manage challenges and arena settings.</p>
+            <button class="modal-close" onclick="closeAuthModal()">&times;</button>
 
-            <form onsubmit="attemptAdminLogin(event)">
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" id="admin-username" class="form-input" placeholder="e.g. admin" autocomplete="off" autofocus>
-                    <div class="form-error" id="username-error">Username must be "admin"</div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">PIN Code</label>
-                    <input type="password" id="admin-pin" class="form-input" placeholder="e.g. 2010" autocomplete="off" maxlength="10">
-                    <div class="form-error" id="pin-error">PIN must be "2010"</div>
-                </div>
-                <div class="form-group">
-                    <div class="form-error" id="login-error">⚠ Access denied. Invalid username or PIN.</div>
-                </div>
-                <button type="submit" class="btn btn-danger btn-block btn-lg">
-                    🔓 AUTHENTICATE & ENTER
+            <!-- TABS -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active signin-active" id="tab-btn-signin" onclick="switchAuthTab('signin')">
+                    🔑 SIGN IN
                 </button>
+                <button type="button" class="auth-tab" id="tab-btn-signup" onclick="switchAuthTab('signup')">
+                    ⚡ SIGN UP
+                </button>
+            </div>
+
+            <!-- GOOGLE SIGN-IN BUTTON -->
+            <button type="button" class="btn-google" id="google-auth-btn" onclick="handleGoogleAuth()">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.02 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                </svg>
+                <span id="google-btn-text">Continue with Google</span>
+            </button>
+
+            <div class="auth-divider">
+                <span>OR USE EMAIL &amp; PASSWORD</span>
+            </div>
+
+            <!-- SIGN IN FORM -->
+            <form id="signin-form" onsubmit="handleEmailSignIn(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="signin-email" class="form-input" placeholder="challenger@domain.com" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="signin-password" class="form-input" placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+                <div class="form-error" id="signin-error"></div>
+                <button type="submit" class="btn btn-secondary btn-block btn-lg" id="signin-submit-btn" style="border-color:var(--neon-blue);color:var(--neon-blue);margin-top:1rem;">
+                    🔓 SIGN IN
+                </button>
+                <div class="auth-switch-link">
+                    Don't have an account yet? <a onclick="switchAuthTab('signup')">Sign Up (Register)</a>
+                </div>
+            </form>
+
+            <!-- SIGN UP FORM -->
+            <form id="signup-form" style="display:none;" onsubmit="handleEmailSignUp(event)">
+                <div class="form-group">
+                    <label class="form-label">Hacker Handle (Display Name) *</label>
+                    <input type="text" id="signup-handle" class="form-input" placeholder="e.g. ZeroCool, CipherGhost" autocomplete="nickname" required maxlength="25">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address *</label>
+                    <input type="email" id="signup-email" class="form-input" placeholder="challenger@domain.com" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password * (Min. 6 characters)</label>
+                    <input type="password" id="signup-password" class="form-input" placeholder="Create password" autocomplete="new-password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password *</label>
+                    <input type="password" id="signup-confirm" class="form-input" placeholder="Confirm password" autocomplete="new-password" required minlength="6">
+                </div>
+                <div class="form-error" id="signup-error"></div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="signup-submit-btn" style="margin-top:1rem;">
+                    ⚡ CREATE ACCOUNT
+                </button>
+                <div class="auth-switch-link">
+                    Already registered? <a onclick="switchAuthTab('signin')">Sign In</a>
+                </div>
             </form>
         </div>
     </div>
@@ -1561,7 +1759,7 @@
 
         <!-- NAVBAR -->
         <nav class="navbar">
-            <div class="nav-brand" onclick="goToIntro()">
+            <div class="nav-brand" onclick="switchTab('challenges')">
                 <span class="nav-brand-icon">🚩</span>
                 <span class="nav-brand-text">CYBERFLAGS</span>
             </div>
@@ -1575,8 +1773,8 @@
                     <span id="sync-indicator">🌐</span>
                     <span id="sync-text">Live Sync</span>
                 </div>
-                <span class="nav-role-badge" id="nav-role-badge"></span>
-                <button class="nav-logout" onclick="goToIntro()" title="Sign out and return to intro">⏻ EXIT</button>
+                <div class="nav-user-info" id="nav-user-info"></div>
+                <button class="nav-logout" onclick="signOutUser()" title="Sign out of your account">⏻ SIGN OUT</button>
             </div>
         </nav>
 
@@ -1591,16 +1789,32 @@
          JAVASCRIPT LOGIC
          ═══════════════════════════════════════════════════════════════════ -->
     <script>
-    /* ─── CONSTANTS & CONFIG ───────────────────────────────────────── */
-    const ADMIN_USERNAME = 'admin';
-    const ADMIN_PIN = '2010';
+    /* ─── FIREBASE CONFIG & ADMIN DEFINITION ────────────────────────── */
+    const firebaseConfig = {
+      apiKey: "AIzaSyD07GC2Rv7vcbKt-U6_ZSHzSsK5uQ15-Lk",
+      authDomain: "cyberflags.firebaseapp.com",
+      projectId: "cyberflags",
+      storageBucket: "cyberflags.firebasestorage.app",
+      messagingSenderId: "273328412991",
+      appId: "1:273328412991:web:0034e117777abbd51b9b8a",
+      measurementId: "G-DV55F4VZZX"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const ADMIN_GOOGLE_EMAIL = 'j.danielwonderson@gmail.com';
+
     const STORAGE_KEY = 'cyberflags_data';
     const SOLVED_KEY = 'cyberflags_solved';
     const LOG_KEY = 'cyberflags_log';
     const SCORE_KEY = 'cyberflags_scores';
     const GH_CONFIG_KEY = 'cyberflags_gh_config';
 
-    let currentRole = null;       // 'admin' | 'anon'
+    let currentUser = null;       // Firebase User object
+    let currentRole = null;       // 'admin' | 'challenger'
+    let currentAuthTab = 'signin';// 'signin' | 'signup'
     let currentTab = 'challenges';
     let editingChallengeId = null;
     let confirmCallback = null;
@@ -1665,13 +1879,15 @@
 
     function addScore(challengeId, points) {
         const scores = getScores();
-        const sessionId = getSessionId();
-        if (!scores[sessionId]) {
-            scores[sessionId] = { total: 0, solved: [], name: 'Anonymous#' + sessionId.slice(0, 4) };
+        const uid = currentUser ? currentUser.uid : getSessionId();
+        const name = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : ('Challenger#' + uid.slice(0, 4));
+        if (!scores[uid]) {
+            scores[uid] = { total: 0, solved: [], name: name };
         }
-        if (!scores[sessionId].solved.includes(challengeId)) {
-            scores[sessionId].solved.push(challengeId);
-            scores[sessionId].total += points;
+        scores[uid].name = name;
+        if (!scores[uid].solved.includes(challengeId)) {
+            scores[uid].solved.push(challengeId);
+            scores[uid].total += points;
         }
         localStorage.setItem(SCORE_KEY, JSON.stringify(scores));
     }
@@ -1868,77 +2084,229 @@
     }
 
     function goToIntro() {
-        currentRole = null;
-        sessionStorage.removeItem('cyberflags_role');
-        showScreen('intro-screen');
+        signOutUser();
     }
 
-    /* ─── AUTHENTICATION & LOGIN ─────────────────────────────────── */
-    function showAdminLogin() {
-        document.getElementById('admin-login-modal').classList.add('active');
-        document.getElementById('admin-username').value = '';
-        document.getElementById('admin-pin').value = '';
-        clearLoginErrors();
-        setTimeout(() => document.getElementById('admin-username').focus(), 100);
+    /* ─── FIREBASE AUTHENTICATION & LOGIN HANDLERS ────────────────── */
+    function openAuthModal(tab = 'signin') {
+        switchAuthTab(tab);
+        clearAuthErrors();
+        document.getElementById('auth-modal').classList.add('active');
     }
 
-    function closeAdminLogin() {
-        document.getElementById('admin-login-modal').classList.remove('active');
-        clearLoginErrors();
+    function closeAuthModal() {
+        document.getElementById('auth-modal').classList.remove('active');
+        clearAuthErrors();
     }
 
-    function clearLoginErrors() {
-        ['username-error','pin-error','login-error'].forEach(id => {
-            document.getElementById(id).classList.remove('visible');
-        });
-        document.getElementById('admin-username').classList.remove('error');
-        document.getElementById('admin-pin').classList.remove('error');
+    function switchAuthTab(tab) {
+        currentAuthTab = tab;
+        clearAuthErrors();
+        const signinBtn = document.getElementById('tab-btn-signin');
+        const signupBtn = document.getElementById('tab-btn-signup');
+        const signinForm = document.getElementById('signin-form');
+        const signupForm = document.getElementById('signup-form');
+        const googleText = document.getElementById('google-btn-text');
+
+        if (tab === 'signin') {
+            signinBtn.className = 'auth-tab active signin-active';
+            signupBtn.className = 'auth-tab';
+            signinForm.style.display = 'block';
+            signupForm.style.display = 'none';
+            googleText.textContent = 'Continue with Google';
+            setTimeout(() => document.getElementById('signin-email')?.focus(), 100);
+        } else {
+            signinBtn.className = 'auth-tab';
+            signupBtn.className = 'auth-tab active';
+            signinForm.style.display = 'none';
+            signupForm.style.display = 'block';
+            googleText.textContent = 'Sign Up with Google';
+            setTimeout(() => document.getElementById('signup-handle')?.focus(), 100);
+        }
     }
 
-    function attemptAdminLogin(e) {
+    function clearAuthErrors() {
+        const siErr = document.getElementById('signin-error');
+        const suErr = document.getElementById('signup-error');
+        if (siErr) { siErr.textContent = ''; siErr.style.display = 'none'; }
+        if (suErr) { suErr.textContent = ''; suErr.style.display = 'none'; }
+    }
+
+    function showAuthError(msg, isSignUp = false) {
+        const errEl = document.getElementById(isSignUp ? 'signup-error' : 'signin-error');
+        if (errEl) {
+            errEl.textContent = msg;
+            errEl.style.display = 'block';
+        } else {
+            showToast(msg, 'error');
+        }
+    }
+
+    /* ─── GOOGLE AUTH (OAUTH POPUP) ────────────────────────────────── */
+    async function handleGoogleAuth() {
+        clearAuthErrors();
+        const googleBtn = document.getElementById('google-auth-btn');
+        if (googleBtn) {
+            googleBtn.disabled = true;
+            googleBtn.style.opacity = '0.7';
+        }
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        try {
+            await auth.signInWithPopup(provider);
+            closeAuthModal();
+            // onAuthStateChanged handles role assignment and dashboard load
+        } catch (err) {
+            console.error('Google Sign-in Error:', err);
+            if (err.code === 'auth/popup-closed-by-user') {
+                showAuthError('Sign-in popup closed before completing.', currentAuthTab === 'signup');
+            } else if (err.code === 'auth/unauthorized-domain') {
+                showAuthError('⚠ Domain not authorized! Add your current domain in Firebase Console under Auth > Settings > Authorized domains.', currentAuthTab === 'signup');
+            } else {
+                showAuthError(err.message || 'Google authentication failed.', currentAuthTab === 'signup');
+            }
+        } finally {
+            if (googleBtn) {
+                googleBtn.disabled = false;
+                googleBtn.style.opacity = '1';
+            }
+        }
+    }
+
+    /* ─── EMAIL & PASSWORD SIGN IN ────────────────────────────────── */
+    async function handleEmailSignIn(e) {
         e.preventDefault();
-        clearLoginErrors();
-        const u = document.getElementById('admin-username').value.trim();
-        const p = document.getElementById('admin-pin').value.trim();
-        let valid = true;
+        clearAuthErrors();
+        const email = document.getElementById('signin-email').value.trim();
+        const password = document.getElementById('signin-password').value;
+        const btn = document.getElementById('signin-submit-btn');
 
-        if (u !== ADMIN_USERNAME) {
-            document.getElementById('admin-username').classList.add('error');
-            document.getElementById('username-error').classList.add('visible');
-            valid = false;
-        }
-        if (p !== ADMIN_PIN) {
-            document.getElementById('admin-pin').classList.add('error');
-            document.getElementById('pin-error').classList.add('visible');
-            valid = false;
-        }
-        if (!valid) {
-            document.getElementById('login-error').classList.add('visible');
-            addLog('Failed admin login attempt', 'red');
+        if (!email || !password) {
+            showAuthError('Please enter both email and password.', false);
             return;
         }
 
-        currentRole = 'admin';
-        sessionStorage.setItem('cyberflags_role', 'admin');
-        closeAdminLogin();
-        enterApp();
-        addLog('Admin authenticated successfully', 'purple');
-        showToast('Welcome, Administrator! Full arena control granted.', 'success');
+        btn.disabled = true;
+        btn.textContent = '⏳ SIGNING IN...';
+
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            closeAuthModal();
+        } catch (err) {
+            console.error('Sign-in error:', err);
+            if (err.code === 'auth/user-not-found') {
+                showAuthError('❌ Account not found! Please click "Sign Up" to register first.', false);
+            } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                showAuthError('❌ Invalid email or password. If you have not created an account yet, please Sign Up first.', false);
+            } else if (err.code === 'auth/invalid-email') {
+                showAuthError('❌ Please enter a valid email address.', false);
+            } else if (err.code === 'auth/too-many-requests') {
+                showAuthError('⚠ Too many failed attempts. Try again in a few minutes.', false);
+            } else {
+                showAuthError('Sign in failed: ' + (err.message || err.code), false);
+            }
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🔓 SIGN IN';
+        }
     }
 
-    function enterAsAnonymous() {
-        currentRole = 'anon';
-        sessionStorage.setItem('cyberflags_role', 'anon');
-        enterApp();
-        addLog('Anonymous challenger entered the arena', 'blue');
-        showToast('Welcome, Challenger! Capture flags & climb the board.', 'info');
+    /* ─── EMAIL & PASSWORD SIGN UP ────────────────────────────────── */
+    async function handleEmailSignUp(e) {
+        e.preventDefault();
+        clearAuthErrors();
+        const handle = document.getElementById('signup-handle').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const confirm = document.getElementById('signup-confirm').value;
+        const btn = document.getElementById('signup-submit-btn');
+
+        if (!handle || !email || !password || !confirm) {
+            showAuthError('Please fill in all required fields.', true);
+            return;
+        }
+
+        if (password !== confirm) {
+            showAuthError('⚠ Passwords do not match!', true);
+            return;
+        }
+
+        if (password.length < 6) {
+            showAuthError('⚠ Password must be at least 6 characters long.', true);
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '⏳ CREATING ACCOUNT...';
+
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            if (userCredential.user) {
+                await userCredential.user.updateProfile({ displayName: handle });
+            }
+            closeAuthModal();
+            showToast(`Account created! Welcome to CYBERFLAGS, ${handle}!`, 'success');
+        } catch (err) {
+            console.error('Sign-up error:', err);
+            if (err.code === 'auth/email-already-in-use') {
+                showAuthError('⚠ This email is already registered! Please switch to Sign In.', true);
+            } else if (err.code === 'auth/weak-password') {
+                showAuthError('⚠ Password is too weak. Please use a stronger password.', true);
+            } else if (err.code === 'auth/invalid-email') {
+                showAuthError('⚠ Please provide a valid email address.', true);
+            } else {
+                showAuthError('Registration failed: ' + (err.message || err.code), true);
+            }
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '⚡ CREATE ACCOUNT';
+        }
     }
+
+    /* ─── SIGN OUT ─────────────────────────────────────────────────── */
+    async function signOutUser() {
+        try {
+            await auth.signOut();
+            currentUser = null;
+            currentRole = null;
+            sessionStorage.removeItem('cyberflags_role');
+            showScreen('intro-screen');
+            showToast('Signed out of the arena.', 'info');
+        } catch (err) {
+            console.error('Sign-out error:', err);
+            showToast('Error signing out: ' + err.message, 'error');
+        }
+    }
+
+    /* ─── FIREBASE AUTH STATE LISTENER ────────────────────────────── */
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            currentUser = user;
+            const email = (user.email || '').toLowerCase().trim();
+            const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
+
+            // CRITICAL RULE: Admin is ONLY accepted through Google Sign-In with j.danielwonderson@gmail.com
+            if (email === ADMIN_GOOGLE_EMAIL.toLowerCase() && isGoogle) {
+                currentRole = 'admin';
+                addLog(`Admin signed in via Google: ${email}`, 'purple');
+            } else {
+                currentRole = 'challenger';
+                addLog(`Challenger signed in: ${user.displayName || email}`, 'blue');
+            }
+
+            enterApp();
+        } else {
+            currentUser = null;
+            currentRole = null;
+            showScreen('intro-screen');
+        }
+    });
 
     function enterApp() {
         // Strict screen transition: Intro screen disappears completely, dashboard appears
         showScreen('app-screen');
         buildNavTabs();
-        buildRoleBadge();
+        updateNavUser();
         currentTab = 'challenges';
         switchTab('challenges');
         updateSyncBadge(isDataSourceRemote);
@@ -1949,9 +2317,9 @@
         const mobileTabs = document.getElementById('mobile-nav');
         let html = '';
         const items = [
-            { id: 'challenges', label: '🎯 Challenges', roles: ['admin', 'anon'] },
-            { id: 'scoreboard', label: '🏆 Scoreboard', roles: ['admin', 'anon'] },
-            { id: 'about', label: 'ℹ️ Rules & Info', roles: ['admin', 'anon'] },
+            { id: 'challenges', label: '🎯 Challenges', roles: ['admin', 'challenger'] },
+            { id: 'scoreboard', label: '🏆 Scoreboard', roles: ['admin', 'challenger'] },
+            { id: 'about', label: 'ℹ️ Rules & Info', roles: ['admin', 'challenger'] },
             { id: 'admin-manage', label: '⚙️ Manage Challenges', roles: ['admin'] },
             { id: 'admin-github', label: '☁️ GitHub Sync', roles: ['admin'] },
             { id: 'admin-activity', label: '📋 Activity Log', roles: ['admin'] },
@@ -1965,15 +2333,32 @@
         mobileTabs.innerHTML = html;
     }
 
-    function buildRoleBadge() {
-        const badge = document.getElementById('nav-role-badge');
-        if (currentRole === 'admin') {
-            badge.className = 'nav-role-badge admin';
-            badge.innerHTML = '🔐 ADMIN';
-        } else {
-            badge.className = 'nav-role-badge anon';
-            badge.innerHTML = '👤 ANONYMOUS';
+    function updateNavUser() {
+        const container = document.getElementById('nav-user-info');
+        if (!container) return;
+        if (!currentUser) {
+            container.innerHTML = '';
+            return;
         }
+
+        const name = currentUser.displayName || currentUser.email.split('@')[0];
+        const photo = currentUser.photoURL;
+        const avatarHtml = photo
+            ? `<img src="${photo}" class="nav-avatar" alt="Avatar" referrerpolicy="no-referrer">`
+            : `<span class="nav-avatar-placeholder">${name.charAt(0).toUpperCase()}</span>`;
+
+        let roleBadge = '';
+        if (currentRole === 'admin') {
+            roleBadge = `<span class="nav-role-badge admin" title="Full Arena Administrator">👑 ADMIN</span>`;
+        } else {
+            roleBadge = `<span class="nav-role-badge challenger" title="Registered Challenger">⚡ CHALLENGER</span>`;
+        }
+
+        container.innerHTML = `
+            ${avatarHtml}
+            <span class="nav-user-name" title="${escapeHtml(currentUser.email)}">${escapeHtml(name)}</span>
+            ${roleBadge}
+        `;
     }
 
     function toggleMobileMenu() {
@@ -3054,7 +3439,7 @@
     /* ─── KEYBOARD SHORTCUTS ──────────────────────────────────────── */
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            closeAdminLogin();
+            closeAuthModal();
             closeDetailModal();
             closeConfirm();
         }
@@ -3168,12 +3553,8 @@
         // Load data globally from challenges.json
         await loadGlobalChallenges();
 
-        // Check if user has an active session from refresh
-        const savedRole = sessionStorage.getItem('cyberflags_role');
-        if (savedRole === 'admin' || savedRole === 'anon') {
-            currentRole = savedRole;
-            enterApp();
-        } else {
+        // If no Firebase user is cached yet, ensure intro screen is active
+        if (!auth.currentUser) {
             showScreen('intro-screen');
         }
     });
