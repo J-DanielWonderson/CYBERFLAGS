@@ -75,7 +75,17 @@
                         if(key === window.__AURORA_BACKUP_KEY__) {
                             console.log("%c[ OVERRIDE ACCEPTED ]", "color:#66fcf1; font-size:20px; font-weight:bold;");
                             console.log("Decrypting raw geometric payload...");
-                            console.log("Raw Output: 7d363230325f72337473346d5f6c3030747633647b47414c46");
+                            
+                            // The payload is dynamically decrypted using the properties of the valid key.
+                            // Reading the source code will only reveal meaningless numbers!
+                            const encryptedPayload = [79, 124, 75, 78, 75, 74, 75, 72, 75, 74, 77, 126, 79, 74, 75, 75, 79, 76, 79, 75, 75, 76, 78, 124, 77, 126, 78, 123, 75, 72, 75, 72, 79, 76, 79, 78, 75, 75, 78, 76, 79, 122, 76, 79, 76, 73, 76, 123, 76, 78];
+                            
+                            let output = "";
+                            for(let i = 0; i < encryptedPayload.length; i++) {
+                                output += String.fromCharCode(encryptedPayload[i] - key.length);
+                            }
+                            
+                            console.log("Raw Output: " + output);
                         } else {
                             console.warn("Protocol failed: 'aurora_key' missing or incorrect in sessionStorage. Tip: Check global window variables for the backup.");
                         }
