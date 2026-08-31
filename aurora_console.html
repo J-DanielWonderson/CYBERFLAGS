@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aurora Admin Console</title>
+    <style>
+        body { 
+            background: #0b0c10; 
+            color: #66fcf1; 
+            font-family: 'Courier New', Courier, monospace; 
+            overflow: hidden;
+        }
+        .locked-screen { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            font-size: 2em; 
+            color: #ff003c; 
+            font-weight: bold;
+        }
+        .hidden-terminal { 
+            display: none; 
+            margin: 50px auto; 
+            width: 80%;
+            border: 2px solid #45a29e; 
+            padding: 30px; 
+            background: #1f2833;
+            box-shadow: 0 0 20px #45a29e;
+        }
+        /* Dev Note: The input field is rendered off-screen to prevent unauthorized geometric overrides */
+        .off-screen { 
+            position: absolute; 
+            left: -9999px; 
+        }
+        h1 { border-bottom: 1px solid #45a29e; padding-bottom: 10px; }
+    </style>
+    <script>
+        // System Backup Variables (Do not delete)
+        window.__AURORA_BACKUP_KEY__ = "Z2VvbWV0cmljX2Rlc2lnbg==";
+    </script>
+</head>
+<body>
+    
+    <div id="screen" class="locked-screen">
+        [ SYSTEM LOCKED: 401 UNAUTHORIZED ]
+    </div>
+    
+    <div id="terminal" class="hidden-terminal">
+        <h1>Project Aurora: Geometric Control Panel</h1>
+        <p>Core systems online. Manual override required.</p>
+        <p>Awaiting 'initiate_protocol' command via hidden interface...</p>
+        
+        <input type="text" id="cmd_input" class="off-screen" placeholder="Type command and press Enter...">
+    </div>
+
+    <script>
+        window.onload = function() {
+            // BOOT SEQUENCE 1: Clearances
+            if(document.cookie.indexOf("access_level=omega") !== -1) {
+                document.getElementById('screen').style.display = 'none';
+                document.getElementById('terminal').style.display = 'block';
+            } else {
+                console.error("Boot Failure: Clearance cookie 'access_level' must be set to 'omega'.");
+            }
+
+            // BOOT SEQUENCE 2: Command Listener
+            document.getElementById('cmd_input').addEventListener('keyup', function(e) {
+                if(e.key === 'Enter') {
+                    if(this.value === 'initiate_protocol') {
+                        
+                        // Validating Session Environment
+                        let key = sessionStorage.getItem('aurora_key');
+                        
+                        if(key === window.__AURORA_BACKUP_KEY__) {
+                            console.log("%c[ OVERRIDE ACCEPTED ]", "color:#66fcf1; font-size:20px; font-weight:bold;");
+                            console.log("Decrypting raw geometric payload...");
+                            console.log("Raw Output: 7d363230325f72337473346d5f6c3030747633647b47414c46");
+                        } else {
+                            console.warn("Protocol failed: 'aurora_key' missing or incorrect in sessionStorage. Tip: Check global window variables for the backup.");
+                        }
+                    } else {
+                        console.log("Unknown command.");
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>
