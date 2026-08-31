@@ -89,5 +89,24 @@
     "hints": [],
     "solves": 0,
     "createdAt": "2026-08-31T14:37:19.920Z"
+  },
+  {
+    "id": "c_mthclaed_ni4z",
+    "title": "The Aurora Console",
+    "category": "Web",
+    "description": "We found a backdoor into the Project Aurora geometric control panel. However, the system is highly fortified. The developers relied heavily on local browser memory and hidden DOM elements to secure their command line.\n\nYou will need to bypass the initial lock screen, locate the hidden command interface, piece together the encryption variables, and trigger the protocol. The final payload is double-layered. Good luck.",
+    "difficulty": "insane",
+    "points": 2000,
+    "flagHash": "15db9172247d23e1e63c07cae7d6565e45ea09525c0ce8450b4a6a98d5f9b78b",
+    "fileUrl": "",
+    "websiteUrl": "https://j-danielwonderson.github.io/CYBERFLAGS/aurora_console.html",
+    "author": "J Daniel Wonderson",
+    "hints": [
+      "Use Session Storage",
+      "Follow all Instructions",
+      "Recollect HTML and CSS"
+    ],
+    "solves": 0,
+    "createdAt": "2026-08-31T14:42:51.493Z"
   }
 ]
