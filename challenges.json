@@ -35,15 +35,16 @@
     "title": "The Phantom Dump",
     "category": "Crypto",
     "description": "A rogue agent wiped the central database, but we managed to pull a single raw system diagnostic log before the server died. We know they hid their master access key inside the traffic noise.\n\nYou'll need to parse the data, follow the breadcrumbs, and peel back multiple layers of encryption to find the flag.",
-    "difficulty": "medium",
-    "points": 500,
+    "difficulty": "hard",
+    "points": 1000,
     "flagHash": "88fd37d13de44b5b1a0eb8c57a44a2466c0e2411ee5242ee5924ceb6d4b398ce",
     "fileUrl": "https://github.com/J-DanielWonderson/CYBERFLAGS/raw/main/CTFWorkspace_PhantomDump.zip",
     "websiteUrl": "",
     "author": "J Daniel Wonderson",
     "hints": [],
     "solves": 0,
-    "createdAt": "2026-08-31T14:32:06.746Z"
+    "createdAt": "2026-08-31T14:32:06.746Z",
+    "updatedAt": "2026-08-31T14:43:19.810Z"
   },
   {
     "id": "c_mthcafo2_8kdv",
