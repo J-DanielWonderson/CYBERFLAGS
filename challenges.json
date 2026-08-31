@@ -31,5 +31,37 @@
     "hints": [],
     "solves": 1,
     "createdAt": "2026-08-28T18:18:22.609Z"
+  },
+  {
+    "id": "c_mthc7gwq_31vd",
+    "title": "The Phantom Dump",
+    "category": "Crypto",
+    "description": "A rogue agent wiped the central database, but we managed to pull a single raw system diagnostic log before the server died. We know they hid their master access key inside the traffic noise.\n\nYou'll need to parse the data, follow the breadcrumbs, and peel back multiple layers of encryption to find the flag.",
+    "difficulty": "medium",
+    "points": 500,
+    "flag": "FLAG{p4tt3rns_ar3_ev3rywh3r3}",
+    "flagHash": "88fd37d13de44b5b1a0eb8c57a44a2466c0e2411ee5242ee5924ceb6d4b398ce",
+    "fileUrl": "https://github.com/J-DanielWonderson/CYBERFLAGS/raw/main/CTFWorkspace_PhantomDump.zip",
+    "websiteUrl": "",
+    "author": "J Daniel Wonderson",
+    "hints": [],
+    "solves": 0,
+    "createdAt": "2026-08-31T14:32:06.746Z"
+  },
+  {
+    "id": "c_mthcafo2_8kdv",
+    "title": "The Obsidian Canvas",
+    "category": "Steganography",
+    "description": "An unknown artist sent us this digital canvas. When we open it, it's just a blank, dark void. But in cybersecurity, what you see isn't always what you get. Images are just math and code rendered by a machine.\n\nYou'll need to manipulate the fabric of the image itself to shed some light on the situation. Once you can see the payload, you'll have to decipher the artist's sequence to extract the flag.",
+    "difficulty": "medium",
+    "points": 500,
+    "flag": "FLAG{scalablesecrets}",
+    "flagHash": "9912d6c3835cdd9587b74cc1dbd5ae46956b1205baba7db6f783ea066eca532c",
+    "fileUrl": "https://github.com/J-DanielWonderson/CYBERFLAGS/raw/main/canvas.svg",
+    "websiteUrl": "",
+    "author": "J Daniel Wonderson",
+    "hints": [],
+    "solves": 0,
+    "createdAt": "2026-08-31T14:34:25.106Z"
   }
 ]
