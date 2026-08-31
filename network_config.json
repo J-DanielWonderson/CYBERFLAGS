@@ -1,0 +1,14 @@
+{
+  "system_alert": "CRITICAL FAILURE. MAIN DATABASE CORRUPTED.",
+  "recovery_protocol": "Assemble the emergency payload. Only extract data from servers that meet BOTH criteria: 1) Located in the 'APAC' region. 2) Status is 'OFFLINE'. Combine their fragments in ascending order of their 'Node_ID'. Finally, apply a standard +13 rotational shift.",
+  "network_nodes": [
+    {"Node_ID": 42, "region": "EMEA", "status": "OFFLINE", "fragment": "ZG9udHVz"},
+    {"Node_ID": 24, "region": "APAC", "status": "OFFLINE", "fragment": "6NGY3M2"},
+    {"Node_ID": 15, "region": "APAC", "status": "ONLINE",  "fragment": "YmFkZGF0"},
+    {"Node_ID": 48, "region": "APAC", "status": "OFFLINE", "fragment": "TB0MXB9"},
+    {"Node_ID": 12, "region": "APAC", "status": "OFFLINE", "fragment": "U1lOVHt"},
+    {"Node_ID": 30, "region": "APAC", "status": "ONLINE",  "fragment": "YWZha2Vj"},
+    {"Node_ID": 18, "region": "NA",   "status": "OFFLINE", "fragment": "b2RlMTIz"},
+    {"Node_ID": 36, "region": "APAC", "status": "OFFLINE", "fragment": "VfMHNfe"}
+  ]
+}
