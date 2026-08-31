@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!--
+    SYSTEM DIAGNOSTIC: 
+    Data payload is present, but visual contrast is zero.
+    Illumination of the text payload is required.
+  -->
+
+  <!-- The Obsidian Background -->
+  <rect width="100%" height="100%" fill="#111111" />
+
+  <desc>
+    TRANSMISSION INTERCEPT:
+    --. . - / ..-. .. .-. ... - / .-.. . - - . .-. ...
+  </desc>
+
+  <!-- Hidden Text Payload -->
+  <g font-family="monospace" font-size="20" fill="#111111">
+    <text x="40" y="80">Security is an illusion</text>
+    <text x="40" y="120">Clever administrators always hide logic in plain sight</text>
+    <text x="40" y="160">Anyone can break the locks if they examine the source</text>
+    <text x="40" y="200">Experts never concede defeat</text>
+    <text x="40" y="240">Rather they explore the text and succeed</text>
+    
+    <text x="40" y="360" font-weight="bold">EXTRACTION SEQUENCE:</text>
+    <text x="40" y="390" font-weight="bold">[1, 5, 7, 9, 13, 15, 17, 20, 22, 23, 25, 27, 29, 31, 33]</text>
+    <text x="40" y="440" font-size="16">Submit as: FLAG{your_result_lowercase}</text>
+  </g>
+</svg>
