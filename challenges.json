@@ -6,15 +6,15 @@
     "description": "We recovered an old casefile from a damaged terminal. Opening casefile.txt shows corrupted gibberish starting with PK... Inspect the clues, uncover the real file format, and extract the secret flag!",
     "difficulty": "easy",
     "points": 200,
-    "flag": "FLAG{f1l3_3xt3ns10n_m4st3r_2026}",
-    "flagHash": "209ce6138d687605cdaf98b9b99853a267dd0a064cd8291c4402a3acdfae2c67",
+    "flag": "FLAG{f1l3_3xtr3ns10n_m4st3r_2026}",
+    "flagHash": "08c10840c72d6eee8e97cb0861be774582d0231e38a02db76b56c631e788fcaf",
     "fileUrl": "https://github.com/J-DanielWonderson/CYBERFLAGS/blob/main/CTFWorkspace-ScrambledFile.zip",
     "websiteUrl": "",
     "author": "J Daniel Wonderson",
     "hints": [],
-    "solves": 0,
+    "solves": 1,
     "createdAt": "2026-08-28T18:14:44.651Z",
-    "updatedAt": "2026-08-29T03:31:13.700Z"
+    "updatedAt": "2026-08-31T12:27:46.636Z"
   },
   {
     "id": "c_mtd9yw41_ixeb",
@@ -29,7 +29,7 @@
     "websiteUrl": "https://j-danielwonderson.github.io/CYBERFLAGS/CTFWorkspace-Quantum.html",
     "author": "J Daniel Wonderson",
     "hints": [],
-    "solves": 0,
+    "solves": 1,
     "createdAt": "2026-08-28T18:18:22.609Z"
   }
 ]
