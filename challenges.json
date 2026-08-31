@@ -63,5 +63,37 @@
     "hints": [],
     "solves": 0,
     "createdAt": "2026-08-31T14:34:25.106Z"
+  },
+  {
+    "id": "c_mthccmvd_rthm",
+    "title": "The Intercepted Drop",
+    "category": "OSINT",
+    "description": "We intercepted a communication between two unknown operatives. We know they are planning a drop-off at a major global monument, but standard email software isn't showing us the whole picture.\n\nExamine the raw transmission, peel back the layers of the custom headers, and track down the geographic coordinates of the dropzone.",
+    "difficulty": "medium",
+    "points": 500,
+    "flag": "FLAG{taj_mahal}",
+    "flagHash": "47e72ff186642dc3149846459ff57ee509e9da1cc16fd626697c738eab161f5a",
+    "fileUrl": "https://github.com/J-DanielWonderson/CYBERFLAGS/raw/main/intercepted.eml",
+    "websiteUrl": "",
+    "author": "J Daniel Wonderson",
+    "hints": [],
+    "solves": 0,
+    "createdAt": "2026-08-31T14:36:07.753Z"
+  },
+  {
+    "id": "c_mthce6k0_eupf",
+    "title": "The Fragmented Network",
+    "category": "Forensics",
+    "description": "Our primary database went down in a targeted attack. The system attempted an emergency backup, but the fail-safe shattered the master key across multiple global server nodes to prevent the attackers from stealing it.\n\nWe managed to download the network_config.json file. You need to read the system's recovery protocol, filter out the decoy nodes, and reassemble the master key to capture the flag.",
+    "difficulty": "medium",
+    "points": 500,
+    "flag": "FLAG{m4s73r_0f_l0g1c}",
+    "flagHash": "6b88e822e210a107980779d0734b503c367aa91fd02a5ba6a102702fc2598fb4",
+    "fileUrl": "https://github.com/J-DanielWonderson/CYBERFLAGS/raw/main/network_config.json",
+    "websiteUrl": "",
+    "author": "J Daniel Wonderson",
+    "hints": [],
+    "solves": 0,
+    "createdAt": "2026-08-31T14:37:19.920Z"
   }
 ]
